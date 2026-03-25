@@ -11,9 +11,11 @@ interface CustomModalProps {
     formId?: string;
     children: React.ReactNode;
     title: string;
+    isLoading?: boolean;
+
 }
 
-export function CustomModal({isOpen, onOpenChange, formId, children, title}: CustomModalProps) {
+export function CustomEditModal({isOpen, onOpenChange, formId, children, title, isLoading}: CustomModalProps) {
     const targetRef = React.useRef(null);
     const {moveProps} = useDraggable({targetRef, canOverflow: true, isDisabled: !isOpen});
 
@@ -37,7 +39,12 @@ export function CustomModal({isOpen, onOpenChange, formId, children, title}: Cus
                             <Button color="danger" variant="light" onPress={onClose}>
                                 閉じる
                             </Button>
-                            <Button color="success" type="submit" form={formId}>
+                            <Button
+                                color="success"
+                                type="submit"
+                                form={formId}
+                                isLoading={isLoading}
+                            >
                                 確定
                             </Button>
                         </ModalFooter>

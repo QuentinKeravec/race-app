@@ -6,7 +6,7 @@ import {Card} from "@heroui/card";
 import {usePathname, useRouter} from "next/navigation";
 import {createClient} from "@/utils/client";
 import {ThemeSwitch} from "@/components/theme-switch";
-import {LayoutGrid, LogOut, MapPinned, UserRound} from 'lucide-react';
+import {Balloon, LayoutGrid, LogOut, MapPinned, UserRound} from 'lucide-react';
 import NextLink from "next/link";
 
 export const Sidebar = () => {
@@ -19,6 +19,11 @@ export const Sidebar = () => {
             key: "/dashboard",
             label: "ダッシュボード",
             icon: <LayoutGrid size={20}/>,
+        },
+        {
+            key: "/events",
+            label: "イベント",
+            icon: <Balloon size={20}/>,
         },
         {
             key: "/races",

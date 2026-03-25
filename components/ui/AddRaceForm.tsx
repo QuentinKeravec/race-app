@@ -1,14 +1,14 @@
 'use client'
 
-import {useForm} from "react-hook-form"
-import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {Select, SelectItem} from "@heroui/select"
-import {Input} from "@heroui/input"
-import {Event} from "@/types/Event"
-import {Status} from "@/types/Status"
-import {createClient} from "@/utils/client"
-import {useRouter} from "next/navigation"
+import {Select, SelectItem} from "@heroui/select";
+import {Input} from "@heroui/input";
+import {Event} from "@/types/Event";
+import {Status} from "@/types/Status";
+import {createClient} from "@/utils/client";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 
 const raceSchema = z.object({
     name: z.string().min(3, "名前は3文字以上で入力してください"),
@@ -23,35 +23,38 @@ interface AddRaceFormProps {
     events: Event[];
     status: Status[];
     onClose: () => void;
+    onLoadingChange:  (loading: boolean) => void;
 }
 
-export function AddRaceForm({id, events, status, onClose}: AddRaceFormProps) {
-    const {register, handleSubmit, formState: {errors, isLoading}} = useForm<RaceFormValues>({
+export function AddRaceForm({id, events, status, onClose, onLoadingChange}: AddRaceFormProps) {
+    const {register, handleSubmit, formState: {errors}} = useForm<RaceFormValues>({
         resolver: zodResolver(raceSchema),
-        mode: "onChange"
     });
     const supabase = createClient()
-    const router = useRouter()
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: async (values: RaceFormValues) => {
+            const {error} = await supabase.from('races').insert([
+                {
+                    name: values.name,
+                    event_id: values.eventId,
+                    status_id: values.statusId
+                }
+            ]);
+            if (error) throw error;
+        },
+        onMutate: () => onLoadingChange(true),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["races"] });
+            onLoadingChange(false);
+            onClose();
+        },
+        onError: () => onLoadingChange(false),
+    });
 
     const onSubmit = async (data: RaceFormValues) => {
-        try {
-            const {error} = await supabase
-                .from('races')
-                .insert([
-                    {
-                        name: data.name,
-                        event_id: data.eventId,
-                        status_id: data.statusId
-                    }
-                ]);
-
-            if (error) throw error;
-
-            router.refresh();
-            onClose();
-        } catch (error: any) {
-            console.error("Erreur lors de l'ajout :", error.message);
-        }
+        mutation.mutate(data);
     };
 
     return (
@@ -71,6 +74,9 @@ export function AddRaceForm({id, events, status, onClose}: AddRaceFormProps) {
                 {...register("eventId")}
                 isInvalid={!!errors.eventId}
                 errorMessage={errors.eventId?.message}
+                listboxProps={{
+                    emptyContent: "データなし"
+                }}
             >
                 {events.map((event) => (
                     <SelectItem key={event.id}>{event.name}</SelectItem>
@@ -82,9 +88,12 @@ export function AddRaceForm({id, events, status, onClose}: AddRaceFormProps) {
                 {...register("statusId")}
                 isInvalid={!!errors.statusId}
                 errorMessage={errors.statusId?.message}
+                listboxProps={{
+                    emptyContent: "データなし"
+                }}
             >
                 {status.map((item) => (
-                    <SelectItem key={item.id}>{item.name}</SelectItem>
+                    <SelectItem key={item.id}>{item.label}</SelectItem>
                 ))}
             </Select>
         </form>

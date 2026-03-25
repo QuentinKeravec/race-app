@@ -1,13 +1,12 @@
 'use client'
 
 import {CustomTable} from "@/components/ui/CustomTable";
-import {Chip} from "@heroui/chip";
 import React, {useState} from "react";
 import {createClient} from "@/utils/client";
 import {title} from "@/components/primitives";
 import {useDisclosure} from "@heroui/modal";
 import {CustomEditModal} from "@/components/ui/CustomEditModal";
-import {AddRaceForm} from "@/components/ui/AddRaceForm";
+import {AddEventForm} from "@/components/ui/AddEventForm";
 import {useRouter} from "next/navigation";
 import {Divider} from "@heroui/divider";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
@@ -17,11 +16,9 @@ import {Selection} from "@heroui/table";
 
 const COLUMNS = [
     {name: "名前", uid: "name", sortable: true},
-    {name: "イベント", uid: "event", sortable: true},
-    {name: "ステータス", uid: "status", sortable: true},
 ];
 
-export default function RacesPage() {
+export default function EventsPage() {
     const supabase = createClient();
     const {
         isOpen: isAddOpen,
@@ -41,51 +38,17 @@ export default function RacesPage() {
     const queryClient = useQueryClient();
     const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
 
-    const { data: races, isLoading: isLoadingRaces } = useQuery({
-        queryKey: ["races"],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from("races")
-                .select(`
-        id,
-        name,
-        events(name),
-        race_statuses(id, label)
-    `);
-            if (error) throw error;
-
-            return data.map(race => ({
-                id: race.id,
-                name: race.name,
-                eventName: race.events?.name || '不明',
-                status: race.race_statuses?.label || '不明',
-                statusId: race.race_statuses?.id
-            }));
-        },
-    });
-
-    const { data: events } = useQuery({
+    const { data: events, isLoading, error } = useQuery({
         queryKey: ["events"],
         queryFn: async () => {
-            const { data, error } = await supabase.from("events").select("id, name");
-            if (error) throw error;
+            const { data, error } = await supabase
+                .from("events")
+                .select("id, name");
+
+            if (error) throw new Error(error.message);
             return data;
         },
     });
-
-    const { data: status, isLoading: isLoadingStatus } = useQuery({
-        queryKey: ["race_statuses"],
-        queryFn: async () => {
-            const { data, error } = await supabase.from("race_statuses").select("id, label");
-            if (error) throw error;
-            return data;
-        },
-        staleTime: Infinity,
-    });
-
-    const statusOptions = React.useMemo(() => {
-        return status?.map(s => ({ name: s.label, uid: s.id })) || [];
-    }, [status]);
 
     const handleOpenAdd = async () => {
         onAddOpen();
@@ -99,7 +62,7 @@ export default function RacesPage() {
     const deleteMutation = useMutation({
         mutationFn: async (ids: (string | number)[]) => {
             const { error } = await supabase
-                .from("races")
+                .from("events")
                 .delete()
                 .in("id", ids);
 
@@ -107,7 +70,7 @@ export default function RacesPage() {
             return ids;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["races"] });
+            queryClient.invalidateQueries({ queryKey: ["events"] });
             setSelectedKeys(new Set([]));
             onDeleteClose();
         },
@@ -120,43 +83,32 @@ export default function RacesPage() {
         deleteMutation.mutate(idsToDelete);
     }
 
-    if (isLoadingRaces || isLoadingStatus) {
-        return <TableSkeleton />;
-    }
+    if (isLoading) return <TableSkeleton />;
+    if (error) return <p>イベントの読み込み中にエラーが発生しました</p>;
 
     return (
         <section className="flex flex-col gap-6 py-8">
             <div className="flex flex-col items-start gap-2 px-2">
                 <h1 className={title({size: "sm"})}>
-                    レース
+                    イベント
                 </h1>
             </div>
             <Divider />
             <CustomTable
                 selectedKeys={selectedKeys}
                 onSelectionChange={setSelectedKeys}
-                data={races || []}
+                data={events || []}
                 columns={COLUMNS}
-                statusOptions={statusOptions}
                 searchKey="name"
-                initialVisibleColumns={["name", "event", "status"]}
+                initialVisibleColumns={["name"]}
                 onAdd={handleOpenAdd}
                 onDelete={handlePrepareDelete}
-                onRowAction={(id: React.Key) => router.push(`/races/${id}`)}
+                onRowAction={(id: React.Key) => router.push(`/events/${id}`)}
                 searchLabel="名前"
                 renderCell={(item, columnKey) => {
                     switch (columnKey) {
                         case "name":
                             return <p className="font-bold">{item.name}</p>;
-                        case "event":
-                            return <p className="font-bold">{item.eventName}</p>;
-                        case "status":
-                            return (
-                                <Chip className="capitalize" color={item.status === "開催中" ? "success" : "danger"}
-                                      size="sm" variant="flat">
-                                    {item.status}
-                                </Chip>
-                            );
                         default:
                             return (item as any)[columnKey];
                     }
@@ -164,16 +116,14 @@ export default function RacesPage() {
             />
 
             <CustomEditModal
-                title="レースを追加"
+                title="イベントを追加"
                 isOpen={isAddOpen}
                 onOpenChange={onAddChange}
-                formId="race-form"
+                formId="event-form"
                 isLoading={isFormLoading}
             >
-                <AddRaceForm
-                    id="race-form"
-                    events={events || []}
-                    status={status || []}
+                <AddEventForm
+                    id="event-form"
                     onClose={onAddClose}
                     onLoadingChange={setIsFormLoading}
                 />
