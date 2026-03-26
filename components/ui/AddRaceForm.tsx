@@ -2,21 +2,13 @@
 
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import * as z from "zod";
 import {Select, SelectItem} from "@heroui/select";
 import {Input} from "@heroui/input";
 import {Event} from "@/types/Event";
 import {Status} from "@/types/Status";
-import {createClient} from "@/utils/client";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-
-const raceSchema = z.object({
-    name: z.string().min(3, "名前は3文字以上で入力してください"),
-    eventId: z.string().min(1, "イベントを選択してください"),
-    statusId: z.string().min(1, "ステータスを選択してください"),
-});
-
-type RaceFormValues = z.infer<typeof raceSchema>;
+import {RaceFormValues, raceSchema} from "@/schemas/raceSchema";
+import {useCreateRace} from "@/hooks/useRaces";
+import {useEffect} from "react";
 
 interface AddRaceFormProps {
     id: string;
@@ -27,34 +19,22 @@ interface AddRaceFormProps {
 }
 
 export function AddRaceForm({id, events, status, onClose, onLoadingChange}: AddRaceFormProps) {
-    const {register, handleSubmit, formState: {errors}} = useForm<RaceFormValues>({
+    const { mutate, isPending } = useCreateRace();
+    const {register, handleSubmit, formState: {errors}, reset} = useForm<RaceFormValues>({
         resolver: zodResolver(raceSchema),
     });
-    const supabase = createClient()
-    const queryClient = useQueryClient();
 
-    const mutation = useMutation({
-        mutationFn: async (values: RaceFormValues) => {
-            const {error} = await supabase.from('races').insert([
-                {
-                    name: values.name,
-                    event_id: values.eventId,
-                    status_id: values.statusId
-                }
-            ]);
-            if (error) throw error;
-        },
-        onMutate: () => onLoadingChange(true),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["races"] });
-            onLoadingChange(false);
-            onClose();
-        },
-        onError: () => onLoadingChange(false),
-    });
+    useEffect(() => {
+        onLoadingChange?.(isPending);
+    }, [isPending, onLoadingChange]);
 
     const onSubmit = async (data: RaceFormValues) => {
-        mutation.mutate(data);
+        mutate(data, {
+            onSuccess: () => {
+                onClose();
+                setTimeout(() => reset(), 300);
+            }
+        });
     };
 
     return (

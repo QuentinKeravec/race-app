@@ -1,9 +1,4 @@
 export type Status = {
-    id: number;
+    id: string;
     label: string;
-}
-
-export interface StatusOption {
-    name: string;
-    uid: string;
 }

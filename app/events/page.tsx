@@ -2,7 +2,6 @@
 
 import {CustomTable} from "@/components/ui/CustomTable";
 import React, {useState} from "react";
-import {createClient} from "@/utils/client";
 import {title} from "@/components/primitives";
 import {useDisclosure} from "@heroui/modal";
 import {CustomEditModal} from "@/components/ui/CustomEditModal";
@@ -10,16 +9,15 @@ import {AddEventForm} from "@/components/ui/AddEventForm";
 import {useRouter} from "next/navigation";
 import {Divider} from "@heroui/divider";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {Selection} from "@heroui/table";
+import {useDeleteEvents, useEvents} from "@/hooks/useEvents";
 
 const COLUMNS = [
     {name: "名前", uid: "name", sortable: true},
 ];
 
 export default function EventsPage() {
-    const supabase = createClient();
     const {
         isOpen: isAddOpen,
         onOpen: onAddOpen,
@@ -35,20 +33,11 @@ export default function EventsPage() {
     const router = useRouter();
     const [isFormLoading, setIsFormLoading] = useState(false);
     const [idsToDelete, setIdsToDelete] = React.useState<(string | number)[]>([]);
-    const queryClient = useQueryClient();
     const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
 
-    const { data: events, isLoading, error } = useQuery({
-        queryKey: ["events"],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from("events")
-                .select("id, name");
-
-            if (error) throw new Error(error.message);
-            return data;
-        },
-    });
+    // DB
+    const { data: events, isLoading, error } = useEvents();
+    const { mutate } = useDeleteEvents();
 
     const handleOpenAdd = async () => {
         onAddOpen();
@@ -59,28 +48,13 @@ export default function EventsPage() {
         onDeleteOpen();
     };
 
-    const deleteMutation = useMutation({
-        mutationFn: async (ids: (string | number)[]) => {
-            const { error } = await supabase
-                .from("events")
-                .delete()
-                .in("id", ids);
-
-            if (error) throw error;
-            return ids;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["events"] });
-            setSelectedKeys(new Set([]));
-            onDeleteClose();
-        },
-        onError: (error) => {
-            console.error("Erreur mutation:", error.message);
-        }
-    });
-
     const handleConfirmDelete = async () => {
-        deleteMutation.mutate(idsToDelete);
+        mutate(idsToDelete, {
+            onSuccess: () => {
+                setSelectedKeys(new Set([]));
+                onDeleteClose();
+            }
+        });
     }
 
     if (isLoading) return <TableSkeleton />;
@@ -106,11 +80,13 @@ export default function EventsPage() {
                 onRowAction={(id: React.Key) => router.push(`/events/${id}`)}
                 searchLabel="名前"
                 renderCell={(item, columnKey) => {
+                    const cellValue = (item as Record<string, any>)[columnKey as string];
+
                     switch (columnKey) {
                         case "name":
                             return <p className="font-bold">{item.name}</p>;
                         default:
-                            return (item as any)[columnKey];
+                            return cellValue;
                     }
                 }}
             />

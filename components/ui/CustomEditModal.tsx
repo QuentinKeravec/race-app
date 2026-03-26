@@ -12,7 +12,6 @@ interface CustomModalProps {
     children: React.ReactNode;
     title: string;
     isLoading?: boolean;
-
 }
 
 export function CustomEditModal({isOpen, onOpenChange, formId, children, title, isLoading}: CustomModalProps) {

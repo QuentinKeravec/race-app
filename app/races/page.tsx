@@ -3,7 +3,6 @@
 import {CustomTable} from "@/components/ui/CustomTable";
 import {Chip} from "@heroui/chip";
 import React, {useState} from "react";
-import {createClient} from "@/utils/client";
 import {title} from "@/components/primitives";
 import {useDisclosure} from "@heroui/modal";
 import {CustomEditModal} from "@/components/ui/CustomEditModal";
@@ -11,9 +10,11 @@ import {AddRaceForm} from "@/components/ui/AddRaceForm";
 import {useRouter} from "next/navigation";
 import {Divider} from "@heroui/divider";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {Selection} from "@heroui/table";
+import {useDeleteRaces, useRaces} from "@/hooks/useRaces";
+import {useEvents} from "@/hooks/useEvents";
+import {useStatuses} from "@/hooks/useStatuses";
 
 const COLUMNS = [
     {name: "名前", uid: "name", sortable: true},
@@ -22,7 +23,6 @@ const COLUMNS = [
 ];
 
 export default function RacesPage() {
-    const supabase = createClient();
     const {
         isOpen: isAddOpen,
         onOpen: onAddOpen,
@@ -38,50 +38,13 @@ export default function RacesPage() {
     const router = useRouter();
     const [isFormLoading, setIsFormLoading] = useState(false);
     const [idsToDelete, setIdsToDelete] = React.useState<(string | number)[]>([]);
-    const queryClient = useQueryClient();
     const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
 
-    const { data: races, isLoading: isLoadingRaces } = useQuery({
-        queryKey: ["races"],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from("races")
-                .select(`
-        id,
-        name,
-        events(name),
-        race_statuses(id, label)
-    `);
-            if (error) throw error;
-
-            return data.map(race => ({
-                id: race.id,
-                name: race.name,
-                eventName: race.events?.name || '不明',
-                status: race.race_statuses?.label || '不明',
-                statusId: race.race_statuses?.id
-            }));
-        },
-    });
-
-    const { data: events } = useQuery({
-        queryKey: ["events"],
-        queryFn: async () => {
-            const { data, error } = await supabase.from("events").select("id, name");
-            if (error) throw error;
-            return data;
-        },
-    });
-
-    const { data: status, isLoading: isLoadingStatus } = useQuery({
-        queryKey: ["race_statuses"],
-        queryFn: async () => {
-            const { data, error } = await supabase.from("race_statuses").select("id, label");
-            if (error) throw error;
-            return data;
-        },
-        staleTime: Infinity,
-    });
+    // DB
+    const { data: races, isLoading: isLoadingRaces } = useRaces();
+    const { mutate } = useDeleteRaces();
+    const { data: events } = useEvents();
+    const { data: status, isLoading: isLoadingStatus } = useStatuses();
 
     const statusOptions = React.useMemo(() => {
         return status?.map(s => ({ name: s.label, uid: s.id })) || [];
@@ -96,29 +59,14 @@ export default function RacesPage() {
         onDeleteOpen();
     };
 
-    const deleteMutation = useMutation({
-        mutationFn: async (ids: (string | number)[]) => {
-            const { error } = await supabase
-                .from("races")
-                .delete()
-                .in("id", ids);
-
-            if (error) throw error;
-            return ids;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["races"] });
-            setSelectedKeys(new Set([]));
-            onDeleteClose();
-        },
-        onError: (error) => {
-            console.error("Erreur mutation:", error.message);
-        }
-    });
-
-    const handleConfirmDelete = async () => {
-        deleteMutation.mutate(idsToDelete);
-    }
+    const handleConfirmDelete = () => {
+        mutate(idsToDelete, {
+            onSuccess: () => {
+                setSelectedKeys(new Set([]));
+                onDeleteClose();
+            }
+        });
+    };
 
     if (isLoadingRaces || isLoadingStatus) {
         return <TableSkeleton />;
@@ -145,6 +93,8 @@ export default function RacesPage() {
                 onRowAction={(id: React.Key) => router.push(`/races/${id}`)}
                 searchLabel="名前"
                 renderCell={(item, columnKey) => {
+                    const cellValue = (item as Record<string, any>)[columnKey as string];
+
                     switch (columnKey) {
                         case "name":
                             return <p className="font-bold">{item.name}</p>;
@@ -158,7 +108,7 @@ export default function RacesPage() {
                                 </Chip>
                             );
                         default:
-                            return (item as any)[columnKey];
+                            return cellValue;
                     }
                 }}
             />
