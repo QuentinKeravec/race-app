@@ -2,17 +2,11 @@
 
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import * as z from "zod";
 import {Input} from "@heroui/input";
 import {createClient} from "@/utils/client";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {EventFormValues, eventSchema} from "@/schemas/eventSchema";
 
-
-const eventSchema = z.object({
-    name: z.string().min(3, "名前は3文字以上で入力してください"),
-});
-
-type EventFormValues = z.infer<typeof eventSchema>;
 
 interface AddEventFormProps {
     id: string;
