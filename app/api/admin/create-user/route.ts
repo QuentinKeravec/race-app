@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-    const { email, password, fullName } = await request.json()
+    const { email, password, fullName, avatarUrl } = await request.json()
 
     const supabaseAdmin = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +18,10 @@ export async function POST(request: Request) {
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
-        user_metadata: { full_name: fullName },
+        user_metadata: {
+            full_name: fullName,
+            avatar_url: avatarUrl
+        },
         email_confirm: true
     })
 

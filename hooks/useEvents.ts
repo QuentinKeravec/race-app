@@ -1,5 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {createClient} from "@/utils/client";
+import {addToast} from "@heroui/toast";
+import {EventFormValues} from "@/schemas/eventSchema";
 
 const supabase = createClient();
 
@@ -17,6 +19,29 @@ export function useEvents() {
     });
 }
 
+export function useCreateEvent() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (event: EventFormValues) => {
+            const {error} = await supabase.from('events').insert([
+                {
+                    name: event.name,
+                }
+            ]);
+            if (error) throw error;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["events"] });
+            addToast({
+                title: "作成完了",
+                description: `${variables.name} を作成しました。`,
+                color: "success",
+            });
+        },
+    })
+}
+
 export function useDeleteEvents() {
     const queryClient = useQueryClient();
 
@@ -32,8 +57,13 @@ export function useDeleteEvents() {
             if (error) throw error;
             return ids;
         },
-        onSuccess: () => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["events"] });
+            addToast({
+                title: "削除完了",
+                description: `${variables.length}件のイベントを削除しました。`,
+                color: "success",
+            });
         },
     });
 }

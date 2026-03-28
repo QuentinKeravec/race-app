@@ -3,10 +3,9 @@
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@heroui/input";
-import {createClient} from "@/utils/client";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {EventFormValues, eventSchema} from "@/schemas/eventSchema";
-
+import {useCreateEvent} from "@/hooks/useEvents";
+import {useEffect} from "react";
 
 interface AddEventFormProps {
     id: string;
@@ -15,28 +14,22 @@ interface AddEventFormProps {
 }
 
 export function AddEventForm({id, onClose, onLoadingChange}: AddEventFormProps) {
-    const {register, handleSubmit, formState: {errors}} = useForm<EventFormValues>({
+    const { mutate, isPending } = useCreateEvent();
+    const {register, handleSubmit, formState: {errors}, reset} = useForm<EventFormValues>({
         resolver: zodResolver(eventSchema),
     });
-    const supabase = createClient()
-    const queryClient = useQueryClient();
 
-    const mutation = useMutation({
-        mutationFn: async (newEvent: EventFormValues) => {
-            const { error } = await supabase.from('events').insert([newEvent]);
-            if (error) throw error;
-        },
-        onMutate: () => onLoadingChange(true),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["events"] });
-            onLoadingChange(false);
-            onClose();
-        },
-        onError: () => onLoadingChange(false),
-    });
+    useEffect(() => {
+        onLoadingChange?.(isPending);
+    }, [isPending, onLoadingChange]);
 
     const onSubmit = (data: EventFormValues) => {
-        mutation.mutate(data);
+        mutate(data, {
+            onSuccess: () => {
+                onClose();
+                setTimeout(() => reset(), 300);
+            }
+        });
     };
 
     return (

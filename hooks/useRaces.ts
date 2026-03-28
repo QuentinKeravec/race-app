@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {createClient} from "@/utils/client";
 import {RaceFormValues} from "@/schemas/raceSchema";
+import {addToast} from "@heroui/toast";
 
 const supabase = createClient();
 
@@ -30,6 +31,31 @@ export function useRaces() {
     });
 }
 
+export function useCreateRace() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (race: RaceFormValues) => {
+            const {error} = await supabase.from('races').insert([
+                {
+                    name: race.name,
+                    event_id: race.eventId,
+                    status_id: race.statusId
+                }
+            ]);
+            if (error) throw error;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["races"] });
+            addToast({
+                title: "作成完了",
+                description: `${variables.name} を作成しました。`,
+                color: "success",
+            });
+        },
+    })
+}
+
 export function useDeleteRaces() {
     const queryClient = useQueryClient();
 
@@ -45,28 +71,13 @@ export function useDeleteRaces() {
             if (error) throw error;
             return ids;
         },
-        onSuccess: () => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["races"] });
+            addToast({
+                title: "削除完了",
+                description: `${variables.length}件のレースを削除しました。`,
+                color: "success",
+            });
         },
     });
-}
-
-export function useCreateRace() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (race: RaceFormValues) => {
-            const {error} = await supabase.from('races').insert([
-                {
-                    name: race.name,
-                    event_id: race.eventId,
-                    status_id: race.statusId
-                }
-            ]);
-            if (error) throw error;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["races"] });
-        },
-    })
 }

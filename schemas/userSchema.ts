@@ -17,6 +17,13 @@ export const userSchema = z.object({
         .regex(/[A-Z]/, "大文字を1文字以上含めてください")
         .regex(/[0-9]/, "大文字を1文字以上含めてください"),
 
+    avatar_url: z.any()
+        .refine((files) => files?.length > 0, "Une image est requise")
+        .refine((files) => files?.[0]?.size <= 5000000, `Taille max 5MB`)
+        .refine(
+            (files) => ["image/jpeg", "image/png", "image/webp"].includes(files?.[0]?.type),
+            "Seuls les formats .jpg, .png et .webp sont acceptés"
+        ),
     //role: z.enum(["admin", "user", "moderator"]).default("user"),
 });
 

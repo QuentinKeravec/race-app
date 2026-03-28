@@ -13,6 +13,7 @@ import {Selection} from "@heroui/table";
 import {useDeleteUsers, useUsers} from "@/hooks/useUsers";
 import {AddUserForm} from "@/components/ui/AddUserForm";
 import {User} from "@heroui/user";
+import {UserProfile} from "@/types/Profile";
 
 const COLUMNS = [
     {name: "ユーザー", uid: "full_name", sortable: true},
@@ -38,7 +39,7 @@ export default function UsersPage() {
 
     // DB
     const { data: users, isLoading, error } = useUsers();
-    const { mutate } = useDeleteUsers();
+    const { mutate: deleteUsers } = useDeleteUsers();
 
     const handleOpenAdd = async () => {
         onAddOpen();
@@ -50,12 +51,21 @@ export default function UsersPage() {
     };
 
     const handleConfirmDelete = async () => {
-        mutate(idsToDelete, {
-            onSuccess: () => {
-                setSelectedKeys(new Set([]));
-                onDeleteClose();
-            }
-        });
+        if (!users) return;
+
+        let usersToDelete: UserProfile[] = [];
+
+        if (selectedKeys === "all") {
+            usersToDelete = users;
+        } else {
+            usersToDelete = users?.filter((u) => selectedKeys.has(u.id));
+        }
+
+        if (usersToDelete.length === 0) return;
+
+        deleteUsers({ users: usersToDelete });
+        setSelectedKeys(new Set([]));
+        onDeleteClose();
     }
 
     if (isLoading) return <TableSkeleton />;
@@ -74,7 +84,7 @@ export default function UsersPage() {
                 onSelectionChange={setSelectedKeys}
                 data={users || []}
                 columns={COLUMNS}
-                searchKey="username"
+                searchKey="full_name"
                 initialVisibleColumns={["full_name", "email"]}
                 onAdd={handleOpenAdd}
                 onDelete={handlePrepareDelete}
@@ -87,7 +97,7 @@ export default function UsersPage() {
                         case "full_name":
                             return (
                                 <User
-                                    avatarProps={{radius: "lg", src: item.avatar_url}}
+                                    avatarProps={{radius: "lg", src: item.avatar_url ?? undefined}}
                                     description={item.email}
                                     name={cellValue}
                                 >
