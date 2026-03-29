@@ -36,7 +36,7 @@ interface CustomTableProps<T> {
     onSelectionChange: (keys: Selection) => void;
 }
 
-export function CustomTable<T extends { id: string | number }>({
+export function CustomTable<T extends { id: string }>({
                                                                    data,
                                                                    columns,
                                                                    searchKey,

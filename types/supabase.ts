@@ -58,16 +58,19 @@ export type Database = {
           created_at: string | null
           id: string
           name: string
+          slug: string
         }
         Insert: {
           created_at?: string | null
           id?: string
           name: string
+          slug: string
         }
         Update: {
           created_at?: string | null
           id?: string
           name?: string
+          slug?: string
         }
         Relationships: []
       }
@@ -195,6 +198,7 @@ export type Database = {
           event_id: string | null
           id: string
           name: string
+          slug: string
           start_time: string | null
           status_id: string | null
         }
@@ -203,6 +207,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           name: string
+          slug: string
           start_time?: string | null
           status_id?: string | null
         }
@@ -211,6 +216,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           name?: string
+          slug?: string
           start_time?: string | null
           status_id?: string | null
         }

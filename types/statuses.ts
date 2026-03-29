@@ -1,4 +1,4 @@
-export type Status = {
+export type Statuses = {
     id: string;
     label: string;
 }

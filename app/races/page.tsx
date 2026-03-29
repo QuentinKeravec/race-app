@@ -1,140 +1,65 @@
-'use client'
+import { createClient } from '@/utils/client';
+import { title } from "@/components/primitives";
+import { Divider } from "@heroui/divider";
+import RaceList from "@/components/races/RaceList";
 
-import {CustomTable} from "@/components/ui/CustomTable";
-import {Chip} from "@heroui/chip";
-import React, {useState} from "react";
-import {title} from "@/components/primitives";
-import {useDisclosure} from "@heroui/modal";
-import {CustomEditModal} from "@/components/ui/CustomEditModal";
-import {AddRaceForm} from "@/components/ui/AddRaceForm";
-import {useRouter} from "next/navigation";
-import {Divider} from "@heroui/divider";
-import {TableSkeleton} from "@/components/ui/TableSkeleton";
-import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
-import {Selection} from "@heroui/table";
-import {useDeleteRaces, useRaces} from "@/hooks/useRaces";
-import {useEvents} from "@/hooks/useEvents";
-import {useStatuses} from "@/hooks/useStatuses";
+export default async function RacesPage() {
+    const supabase = createClient();
 
-const COLUMNS = [
-    {name: "名前", uid: "name", sortable: true},
-    {name: "イベント", uid: "event", sortable: true},
-    {name: "ステータス", uid: "status", sortable: true},
-];
+    const [racesRes, eventsRes, statusesRes] = await Promise.all([
+        supabase.from("races")
+            .select(`
+                    *,
+                    events ( name ),
+                    race_statuses ( id, label )
+                `),
+        supabase.from('events').select('*'),
+        supabase.from('race_statuses').select('*'),
+    ]);
 
-export default function RacesPage() {
-    const {
-        isOpen: isAddOpen,
-        onOpen: onAddOpen,
-        onOpenChange: onAddChange,
-        onClose: onAddClose
-    } = useDisclosure();
-    const {
-        isOpen: isDeleteOpen,
-        onOpen: onDeleteOpen,
-        onOpenChange: onDeleteChange,
-        onClose: onDeleteClose
-    } = useDisclosure();
-    const router = useRouter();
-    const [isFormLoading, setIsFormLoading] = useState(false);
-    const [idsToDelete, setIdsToDelete] = React.useState<(string | number)[]>([]);
-    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
 
-    // DB
-    const { data: races, isLoading: isLoadingRaces } = useRaces();
-    const { mutate } = useDeleteRaces();
-    const { data: events } = useEvents();
-    const { data: status, isLoading: isLoadingStatus } = useStatuses();
+    const events = eventsRes.data || [];
+    const statuses = statusesRes.data || [];
 
-    const statusOptions = React.useMemo(() => {
-        return status?.map(s => ({ name: s.label, uid: s.id })) || [];
-    }, [status]);
+    const formatter = new Intl.DateTimeFormat('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Asia/Tokyo',
+    });
 
-    const handleOpenAdd = async () => {
-        onAddOpen();
-    };
+    const transformedRaces = (racesRes.data || []).map((race: any) => ({
+        id: race.id,
+        name: race.name,
+        slug: race.slug,
+        distanceMeters: race.distance_meters ? (race.distance_meters / 1000).toFixed(3) : "0",
+        startTime: race.start_time ? formatter.format(new Date(race.start_time)) : "不明",
+        eventName: (Array.isArray(race.events) ? race.events[0]?.name : race.events?.name) ?? "不明",
+        status: (Array.isArray(race.race_statuses) ? race.race_statuses[0]?.label : race.race_statuses?.label) ?? "不明",
+        statusId: (Array.isArray(race.race_statuses) ? race.race_statuses[0]?.id : race.race_statuses?.id) ?? "",
+    }));
 
-    const handlePrepareDelete = (ids: (string | number)[]) => {
-        setIdsToDelete(ids);
-        onDeleteOpen();
-    };
-
-    const handleConfirmDelete = () => {
-        mutate(idsToDelete, {
-            onSuccess: () => {
-                setSelectedKeys(new Set([]));
-                onDeleteClose();
-            }
-        });
-    };
-
-    if (isLoadingRaces || isLoadingStatus) {
-        return <TableSkeleton />;
-    }
+    const statusOptions = statuses.map(s => ({
+        name: s.label,
+        uid: s.id.toString()
+    }));
 
     return (
         <section className="flex flex-col gap-6 py-8">
             <div className="flex flex-col items-start gap-2 px-2">
-                <h1 className={title({size: "sm"})}>
+                <h1 className={title({ size: "sm" })}>
                     レース
                 </h1>
             </div>
             <Divider />
-            <CustomTable
-                selectedKeys={selectedKeys}
-                onSelectionChange={setSelectedKeys}
-                data={races || []}
-                columns={COLUMNS}
+
+            <RaceList
+                initialRaces={transformedRaces}
+                events={events}
+                statuses={statuses}
                 statusOptions={statusOptions}
-                searchKey="name"
-                initialVisibleColumns={["name", "event", "status"]}
-                onAdd={handleOpenAdd}
-                onDelete={handlePrepareDelete}
-                onRowAction={(id: React.Key) => router.push(`/races/${id}`)}
-                searchLabel="名前"
-                renderCell={(item, columnKey) => {
-                    const cellValue = (item as Record<string, any>)[columnKey as string];
-
-                    switch (columnKey) {
-                        case "name":
-                            return <p className="font-bold">{item.name}</p>;
-                        case "event":
-                            return <p className="font-bold">{item.eventName}</p>;
-                        case "status":
-                            return (
-                                <Chip className="capitalize" color={item.status === "開催中" ? "success" : "danger"}
-                                      size="sm" variant="flat">
-                                    {item.status}
-                                </Chip>
-                            );
-                        default:
-                            return cellValue;
-                    }
-                }}
-            />
-
-            <CustomEditModal
-                title="レースを追加"
-                isOpen={isAddOpen}
-                onOpenChange={onAddChange}
-                formId="race-form"
-                isLoading={isFormLoading}
-            >
-                <AddRaceForm
-                    id="race-form"
-                    events={events || []}
-                    status={status || []}
-                    onClose={onAddClose}
-                    onLoadingChange={setIsFormLoading}
-                />
-            </CustomEditModal>
-
-            <CustomDeleteModal
-                isOpen={isDeleteOpen}
-                onOpenChange={onDeleteChange}
-                onDelete={handleConfirmDelete}
-                isLoading={isFormLoading}
-                ids={idsToDelete}
             />
         </section>
     );

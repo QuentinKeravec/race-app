@@ -7,6 +7,7 @@ import {HeroUIProvider} from "@heroui/system";
 import {useRouter} from "next/navigation";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {ToastProvider} from "@heroui/toast";
+import { I18nProvider } from "@react-aria/i18n";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -29,7 +30,9 @@ export function Providers({ children, themeProps }: ProvidersProps) {
         <HeroUIProvider navigate={router.push}>
           <NextThemesProvider {...themeProps}>
             <ToastProvider />
-            {children}
+            <I18nProvider locale="ja-JP">
+              {children}
+            </I18nProvider>
           </NextThemesProvider>
         </HeroUIProvider>
       </QueryClientProvider>

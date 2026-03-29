@@ -11,9 +11,9 @@ import {TableSkeleton} from "@/components/ui/TableSkeleton";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {Selection} from "@heroui/table";
 import {useDeleteUsers, useUsers} from "@/hooks/useUsers";
-import {AddUserForm} from "@/components/ui/AddUserForm";
+import {AddUserForm} from "@/components/users/AddUserForm";
 import {User} from "@heroui/user";
-import {UserProfile} from "@/types/Profile";
+import {UserProfile} from "@/types/profile";
 
 const COLUMNS = [
     {name: "ユーザー", uid: "full_name", sortable: true},
@@ -32,7 +32,6 @@ export default function UsersPage() {
         onOpenChange: onDeleteChange,
         onClose: onDeleteClose
     } = useDisclosure();
-    const router = useRouter();
     const [isFormLoading, setIsFormLoading] = useState(false);
     const [idsToDelete, setIdsToDelete] = React.useState<(string | number)[]>([]);
     const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
@@ -88,7 +87,6 @@ export default function UsersPage() {
                 initialVisibleColumns={["full_name", "email"]}
                 onAdd={handleOpenAdd}
                 onDelete={handlePrepareDelete}
-                onRowAction={(id: React.Key) => router.push(`/events/${id}`)}
                 searchLabel="名前"
                 renderCell={(item, columnKey) => {
                     const cellValue = (item as Record<string, any>)[columnKey as string];
