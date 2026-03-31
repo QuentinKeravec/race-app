@@ -1,50 +1,68 @@
 'use server'
 
-import { createClient } from "@/utils/client";
-import { revalidatePath } from "next/cache";
-import { raceSchema } from "@/schemas/raceSchema";
+import {createClient} from "@/utils/client";
+import {raceSchema} from "@/schemas/raceSchema";
 
-export async function createRaceAction(formData: any) {
+export async function getRacesAction() {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('races')
+        .select(`
+                *,
+                events ( name ),
+                race_statuses ( id, label )
+        `)
+    ;
+
+    if (error) throw new Error(error.message);
+    return data || [];
+}
+
+
+export async function createRaceAction(data: any) {
     const supabase = createClient();
 
-    const validatedFields = raceSchema.safeParse(formData);
+    const validatedFields = raceSchema.safeParse(data);
     if (!validatedFields.success) {
-        return { error: "入力内容が正しくありません" }
-    };
+        return { error: "入力内容が正しくありません" };
+    }
 
-    const data = validatedFields.data;
+    const {
+        name,
+        slug,
+        distanceMeters,
+        startTime,
+        eventId,
+        statusId
+    } = validatedFields.data;
 
     const { error } = await supabase
         .from('races')
         .insert([{
-            name: data.name,
-            slug: data.slug,
-            distance_meters: data.distanceMeters,
-            start_time: data.startTime,
-            event_id: data.eventId,
-            status_id: data.statusId
+            name: name,
+            slug: slug,
+            distance_meters: distanceMeters,
+            start_time: startTime,
+            event_id: eventId,
+            status_id: statusId
         }]);
 
     if (error) {
-        return { error: "データベースへの保存中にエラーが発生しました" }
-    };
-
-    revalidatePath('/races');
+        console.error(error);
+        return { error: "データベースへの保存中にエラーが発生しました" };
+    }
 
     return { success: true };
 }
 
 export async function deleteRacesAction(ids: string[]) {
-    const supabase = await createClient();
+    const supabase = createClient();
 
     const { error } = await supabase
         .from('races')
         .delete()
         .in('id', ids);
 
-    if (!error) {
-        revalidatePath('/races')
-    };
-    return { error };
+    return { error: error?.message };
 }
 

@@ -10,15 +10,14 @@ import {CustomEditModal} from "@/components/ui/CustomEditModal";
 import {AddEventForm} from "@/components/events/AddEventForm";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
-import {deleteEventsAction} from "@/app/events/actions";
-import {addToast} from "@heroui/toast";
 import {Event} from "@/types/event";
+import {useDeleteEvents, useEvents} from "@/hooks/useEvents";
 
 interface EventListProps {
     initialEvents: Event[];
 }
 
-export default function RaceList({ initialEvents }: EventListProps) {
+export default function EventList({ initialEvents }: EventListProps) {
     const router = useRouter();
     const { isOpen: isAddOpen, onOpen: onAddOpen, onOpenChange: onAddChange, onClose: onAddClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteChange, onClose: onDeleteClose } = useDisclosure();
@@ -32,27 +31,18 @@ export default function RaceList({ initialEvents }: EventListProps) {
         setIsClient(true);
     }, []);
 
-    const handleConfirmDelete = async () => {
-        setIsFormLoading(true);
-        const result = await deleteEventsAction(idsToDelete);
+    const { data: events } = useEvents(initialEvents);
+    const { mutate: deleteEvents, isPending } = useDeleteEvents();
 
-        if (result?.error) {
-            addToast({
-                title: "エラー",
-                description: `${result.error}`,
-                color: "danger",
-            });
-        } else {
-            addToast({
-                title: "削除完了",
-                description: `${idsToDelete.length}件のイベントを削除しました。`,
-                color: "success",
-            });
-            setSelectedKeys(new Set([]));
-            onDeleteClose();
-        }
-
-        setIsFormLoading(false);
+    const handleConfirmDelete = () => {
+        deleteEvents(idsToDelete, {
+            onSuccess: (result) => {
+                if (!result?.error) {
+                    setSelectedKeys(new Set([]));
+                    onDeleteClose();
+                }
+            }
+        });
     };
 
     if (!isClient) return <TableSkeleton />;
@@ -70,7 +60,7 @@ export default function RaceList({ initialEvents }: EventListProps) {
                         setIdsToDelete(Array.from(keys).map(k => String(k)));
                     }
                 }}
-                data={initialEvents}
+                data={events||[]}
                 columns={[
                     {name: "名前", uid: "name", sortable: true},
                 ]}
@@ -118,7 +108,7 @@ export default function RaceList({ initialEvents }: EventListProps) {
                 isOpen={isDeleteOpen}
                 onOpenChange={onDeleteChange}
                 onDelete={handleConfirmDelete}
-                isLoading={isFormLoading}
+                isLoading={isPending}
                 ids={idsToDelete}
             />
         </>

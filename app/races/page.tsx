@@ -1,7 +1,14 @@
-import { createClient } from '@/utils/client';
-import { title } from "@/components/primitives";
-import { Divider } from "@heroui/divider";
+import {createClient} from '@/utils/client';
+import {title} from "@/components/primitives";
+import {Divider} from "@heroui/divider";
 import RaceList from "@/components/races/RaceList";
+import {Metadata} from "next";
+import {transformRace} from "@/utils/transformers";
+
+export const metadata: Metadata = {
+    title: "レース一覧",
+    description: "全てのレース管理画面",
+};
 
 export default async function RacesPage() {
     const supabase = createClient();
@@ -12,7 +19,7 @@ export default async function RacesPage() {
                     *,
                     events ( name ),
                     race_statuses ( id, label )
-                `),
+            `),
         supabase.from('events').select('*'),
         supabase.from('race_statuses').select('*'),
     ]);
@@ -20,26 +27,7 @@ export default async function RacesPage() {
 
     const events = eventsRes.data || [];
     const statuses = statusesRes.data || [];
-
-    const formatter = new Intl.DateTimeFormat('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'Asia/Tokyo',
-    });
-
-    const transformedRaces = (racesRes.data || []).map((race: any) => ({
-        id: race.id,
-        name: race.name,
-        slug: race.slug,
-        distanceMeters: race.distance_meters ? (race.distance_meters / 1000).toFixed(3) : "0",
-        startTime: race.start_time ? formatter.format(new Date(race.start_time)) : "不明",
-        eventName: (Array.isArray(race.events) ? race.events[0]?.name : race.events?.name) ?? "不明",
-        status: (Array.isArray(race.race_statuses) ? race.race_statuses[0]?.label : race.race_statuses?.label) ?? "不明",
-        statusId: (Array.isArray(race.race_statuses) ? race.race_statuses[0]?.id : race.race_statuses?.id) ?? "",
-    }));
+    const transformedRaces = (racesRes.data || []).map(transformRace);
 
     const statusOptions = statuses.map(s => ({
         name: s.label,
@@ -50,7 +38,7 @@ export default async function RacesPage() {
         <section className="flex flex-col gap-6 py-8">
             <div className="flex flex-col items-start gap-2 px-2">
                 <h1 className={title({ size: "sm" })}>
-                    レース
+                    レース一覧
                 </h1>
             </div>
             <Divider />

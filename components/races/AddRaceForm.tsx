@@ -11,8 +11,7 @@ import {useEffect} from "react";
 import {toRomaji} from "wanakana";
 import {DatePicker} from "@heroui/date-picker";
 import {parseAbsoluteToLocal} from "@internationalized/date";
-import {createRaceAction} from "@/app/races/actions";
-import {addToast} from "@heroui/toast";
+import {useCreateRace} from "@/hooks/useRaces";
 
 interface AddRaceFormProps {
     id: string;
@@ -40,33 +39,17 @@ export function AddRaceForm({id, events, status, onClose, onLoadingChange}: AddR
         }
     }, [raceName, setValue]);
 
-    const onSubmit = async (data: RaceFormValues) => {
-        onLoadingChange(true);
+    const { mutate: createRace } = useCreateRace();
 
-        try {
-            const result = await createRaceAction(data);
-
-            if (result?.error) {
-                throw new Error(result.error);
+    const onSubmit = (data: RaceFormValues) => {
+        createRace(data, {
+            onSuccess: async (result) => {
+                if (!result?.error) {
+                    onClose();
+                    setTimeout(() => reset(), 300);
+                }
             }
-
-            addToast({
-                title: "作成完了",
-                description: `${data.name} を作成しました。`,
-                color: "success",
-            });
-            onClose();
-            setTimeout(() => reset(), 300);
-
-        } catch (err) {
-            addToast({
-                title: "エラー",
-                description: err instanceof Error ? err.message : "予期せぬエラーが発生しました",
-                color: "danger",
-            });
-        } finally {
-            onLoadingChange(false);
-        }
+        })
     };
 
     return (

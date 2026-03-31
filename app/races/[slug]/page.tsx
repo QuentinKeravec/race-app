@@ -4,10 +4,23 @@ import {Progress} from "@heroui/progress";
 import {Chip} from "@heroui/chip";
 import {Divider} from "@heroui/divider";
 import {User} from "@heroui/user";
-import {Breadcrumbs, BreadcrumbItem} from "@heroui/breadcrumbs";
+import {CustomBreadcrumbs} from "@/components/ui/CustomBreadcumbs";
+import {Metadata} from "next";
+import {createClient} from "@/utils/client";
 
 interface RacePageProps {
     params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: RacePageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const supabase = createClient();
+    const { data: race } = await supabase.from('races').select('name').eq('slug', slug).single();
+
+    return {
+        title: race?.name,
+        description: `Détails et gestion de la course : ${race?.name}.`
+    };
 }
 
 export default async function RaceAdminDetail({ params }: RacePageProps) {
@@ -20,11 +33,11 @@ export default async function RaceAdminDetail({ params }: RacePageProps) {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold">{ slug }</h1>
-                    <Breadcrumbs underline="hover" className="mb-6">
-                        <BreadcrumbItem href="/dashboard">Dashboard</BreadcrumbItem>
-                        <BreadcrumbItem href="/races">Courses</BreadcrumbItem>
-                        <BreadcrumbItem>{raceName}</BreadcrumbItem>
-                    </Breadcrumbs>
+                    <CustomBreadcrumbs
+                        parentLabel="レース一覧"
+                        link="/races"
+                        childrenLabel={raceName}
+                    />
                 </div>
                 <div className="flex gap-3">
                     <Button variant="flat" color="primary">Modifier</Button>

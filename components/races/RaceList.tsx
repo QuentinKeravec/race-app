@@ -11,10 +11,9 @@ import {CustomEditModal} from "@/components/ui/CustomEditModal";
 import {AddRaceForm} from "@/components/races/AddRaceForm";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
-import {deleteRacesAction} from "@/app/races/actions";
-import {addToast} from "@heroui/toast";
 import {Tables} from "@/types/supabase";
 import {TransformedRace} from "@/types/race";
+import {useDeleteRaces, useRaces} from "@/hooks/useRaces";
 
 interface RaceListProps {
     initialRaces: TransformedRace[];
@@ -37,27 +36,18 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
         setIsClient(true);
     }, []);
 
-    const handleConfirmDelete = async () => {
-        setIsFormLoading(true);
-        const result = await deleteRacesAction(idsToDelete);
+    const { data: races } = useRaces(initialRaces);
+    const { mutate: deleteRaces, isPending } = useDeleteRaces();
 
-        if (result?.error) {
-            addToast({
-                title: "エラー",
-                description: `${result.error}`,
-                color: "danger",
-            });
-        } else {
-            addToast({
-                title: "削除完了",
-                description: `${idsToDelete.length}件のレースを削除しました。`,
-                color: "success",
-            });
-            setSelectedKeys(new Set([]));
-            onDeleteClose();
-        }
-
-        setIsFormLoading(false);
+    const handleConfirmDelete = () => {
+        deleteRaces(idsToDelete, {
+            onSuccess: (result) => {
+                if (!result?.error) {
+                    setSelectedKeys(new Set([]));
+                    onDeleteClose();
+                }
+            }
+        });
     };
 
     if (!isClient) return <TableSkeleton />;
@@ -75,7 +65,7 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                         setIdsToDelete(Array.from(keys).map(k => String(k)));
                     }
                 }}
-                data={initialRaces}
+                data={races||[]}
                 columns={[
                     { name: "名前", uid: "name", sortable: true },
                     { name: "イベント", uid: "event", sortable: true },
@@ -143,7 +133,7 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                 isOpen={isDeleteOpen}
                 onOpenChange={onDeleteChange}
                 onDelete={handleConfirmDelete}
-                isLoading={isFormLoading}
+                isLoading={isPending}
                 ids={idsToDelete}
             />
         </>

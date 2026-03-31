@@ -1,45 +1,47 @@
 'use server'
 
 import { createClient } from "@/utils/client";
-import { revalidatePath } from "next/cache";
 import { eventSchema } from "@/schemas/eventSchema";
 
-export async function createEventAction(formData: any) {
+export async function getEventsAction() {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('events')
+        .select('id, name, slug')
+        .order('name', { ascending: true });
+
+    if (error) throw new Error(error.message);
+    return data || [];
+}
+
+export async function createEventAction(data: any) {
     const supabase = createClient();
 
-    const validatedFields = eventSchema.safeParse(formData);
+    const validatedFields = eventSchema.safeParse(data);
     if (!validatedFields.success) {
-        return { error: "入力内容が正しくありません" }
-    };
+        return { error: "入力内容が正しくありません" };
+    }
 
-    const data = validatedFields.data;
+    const { name, slug } = validatedFields.data;
 
     const { error } = await supabase
         .from('events')
-        .insert([{
-            name: data.name,
-            slug: data.slug,
-        }]);
+        .insert([{ name, slug }]);
 
     if (error) {
-        return { error: "データベースへの保存中にエラーが発生しました" }
-    };
-
-    revalidatePath('/events');
+        console.error(error);
+        return { error: "データベースへの保存中にエラーが発生しました" };
+    }
 
     return { success: true };
 }
 
 export async function deleteEventsAction(ids: string[]) {
-    const supabase = await createClient();
-
+    const supabase = createClient();
     const { error } = await supabase
         .from('events')
         .delete()
         .in('id', ids);
 
-    if (!error) {
-        revalidatePath('/events')
-    };
-    return { error };
+    return { error: error?.message };
 }
