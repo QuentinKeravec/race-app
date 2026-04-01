@@ -168,7 +168,7 @@ export function CustomTable<T extends { id: string }>({
                             ))}
                         </DropdownMenu>
                     </Dropdown>
-                    <Button color="success" endContent={<PlusIcon/>} onPress={onAdd}>追加</Button>
+                    <Button color="primary" endContent={<PlusIcon/>} onPress={onAdd}>追加</Button>
                     {count > 0 && (
                         <Button onPress={handlePrepareDelete} color="danger">
                             {count}件を削除
@@ -211,7 +211,7 @@ export function CustomTable<T extends { id: string }>({
               ? "全ての項目を選択済み"
               : `${filteredItems.length}件中${selectedKeys.size}件選択`}
         </span>
-            <Pagination isCompact showControls color="success" page={page} total={pages} onChange={setPage}/>
+            <Pagination isCompact showControls color="primary" page={page} total={pages} onChange={setPage}/>
             <div className="hidden sm:flex w-[30%] justify-end gap-2">
                 <Button isDisabled={pages === 1} size="sm" variant="flat"
                         onPress={() => setPage((p) => Math.max(p - 1, 1))}>前へ</Button>

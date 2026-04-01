@@ -3,8 +3,8 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {addToast} from "@heroui/toast";
 import {TransformedRace} from "@/types/race";
-import {createRaceAction, deleteRacesAction, getRacesAction} from "@/app/races/actions";
-import {transformRace} from "@/utils/transformers";
+import {createRaceAction, deleteRacesAction, getParticipantsAction, getRacesAction} from "@/app/races/actions";
+import {transformRace, transformParticipant} from "@/utils/transformers";
 
 export function useRaces(initialRaces?: TransformedRace[]) {
     return useQuery({
@@ -75,6 +75,16 @@ export function useDeleteRaces() {
         },
         onError: () => {
             addToast({ title: "エラー", description: "通信エラーが発生しました", color: "danger" });
+        }
+    });
+}
+
+export function useParticipants(raceId: string) {
+    return useQuery({
+        queryKey: ["participants", raceId],
+        queryFn: async () => {
+            const rawParticipants = await getParticipantsAction();
+            return rawParticipants.map(transformParticipant);
         }
     });
 }

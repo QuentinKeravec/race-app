@@ -65,11 +65,10 @@ export default function LoginPage() {
                             onValueChange={setPassword}
                         />
                         <Button
-                            color="success"
+                            color="primary"
                             type="submit"
                             isLoading={loading}
                             className="mt-2"
-                            variant="flat"
                         >
                             ログイン
                         </Button>

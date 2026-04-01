@@ -7,6 +7,7 @@ import {User} from "@heroui/user";
 import {CustomBreadcrumbs} from "@/components/ui/CustomBreadcumbs";
 import {Metadata} from "next";
 import {createClient} from "@/utils/client";
+import RaceTabs from "@/components/races/RaceTabs";
 
 interface RacePageProps {
     params: Promise<{ slug: string }>;
@@ -15,7 +16,7 @@ interface RacePageProps {
 export async function generateMetadata({ params }: RacePageProps): Promise<Metadata> {
     const { slug } = await params;
     const supabase = createClient();
-    const { data: race } = await supabase.from('races').select('name').eq('slug', slug).single();
+    const { data: race } = await supabase.from('races').select('id, name').eq('slug', slug).single();
 
     return {
         title: race?.name,
@@ -23,20 +24,22 @@ export async function generateMetadata({ params }: RacePageProps): Promise<Metad
     };
 }
 
-export default async function RaceAdminDetail({ params }: RacePageProps) {
+export default async function RaceDetailsPage({ params }: RacePageProps) {
     const { slug } = await params;
 
-    const raceName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    const supabase = createClient();
+    const { data: race } = await supabase.from('races').select('id, name').eq('slug', slug).single();
+
     return (
         <div className="max-w-7xl mx-auto p-6 space-y-8">
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold">{ slug }</h1>
+                    <h1 className="text-3xl font-bold">{ race?.name }</h1>
                     <CustomBreadcrumbs
                         parentLabel="レース一覧"
                         link="/races"
-                        childrenLabel={raceName}
+                        childrenLabel={race?.name}
                     />
                 </div>
                 <div className="flex gap-3">
@@ -81,29 +84,7 @@ export default async function RaceAdminDetail({ params }: RacePageProps) {
                 </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                <Card className="lg:col-span-2">
-                    <CardHeader className="flex justify-between px-6 py-4">
-                        <h4 className="font-bold text-lg">Checklist Logistique</h4>
-                        <Button size="sm" variant="light" color="primary">Ajouter une tâche</Button>
-                    </CardHeader>
-                    <Divider />
-                    <CardBody className="px-6 space-y-4">
-                        {[
-                            { task: "Permis préfectoral (Police)", status: "OK", color: "success" },
-                            { task: "Commande ravitaillement (Bananes/Eau)", status: "En attente", color: "warning" },
-                            { task: "Installation Arches & Barrières", status: "À faire", color: "default" },
-                            { task: "Vérification Chronométrie (Puces)", status: "OK", color: "success" }
-                        ].map((item, index) => (
-                            <div key={index} className="flex justify-between items-center py-2 border-b border-divider last:border-none">
-                                <span className="text-default-700">{item.task}</span>
-                                <Chip size="sm" variant="flat" color={item.color as any}>{item.status}</Chip>
-                            </div>
-                        ))}
-                    </CardBody>
-                </Card>
-
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <Card>
                     <CardHeader className="px-6 py-4">
                         <h4 className="font-bold text-lg">Responsables Zone</h4>
@@ -127,6 +108,8 @@ export default async function RaceAdminDetail({ params }: RacePageProps) {
                         />
                     </CardBody>
                 </Card>
+
+                {race && <RaceTabs raceId={race.id} />}
             </div>
         </div>
     );

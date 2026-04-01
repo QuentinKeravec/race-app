@@ -1,0 +1,17 @@
+export type Participant = {
+    full_name: string | null
+    id: string
+    race_id: string | null
+    runnet_id: string | null
+    tshirt_size: string | null
+    checked_in: boolean | null
+}
+
+export type TransformedParticipant = {
+    id: string;
+    runnetId: string | null;
+    fullName: string | null;
+    tshirtSize: string | null;
+    checkedIn: boolean | null;
+    raceId: string | null;
+}

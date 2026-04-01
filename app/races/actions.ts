@@ -66,3 +66,13 @@ export async function deleteRacesAction(ids: string[]) {
     return { error: error?.message };
 }
 
+export async function getParticipantsAction() {
+    const supabase = createClient();
+    const { data, error } = await supabase
+        .from('participants')
+        .select(`*`);
+
+    if (error) throw new Error(error.message);
+    return data || [];
+}
+

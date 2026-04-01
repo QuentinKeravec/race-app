@@ -47,7 +47,7 @@ export const Sidebar = () => {
         <Card className="h-[calc(100vh-2rem)] w-64 p-4 flex flex-col justify-between sticky top-4">
             <div className="flex flex-col gap-6">
                 <div className="px-2 py-4 flex items-center gap-2">
-                    <LayoutGrid size={20} className="text-success"/>
+                    <LayoutGrid size={20} className="text-primary"/>
                     <h2 className="text-xl font-bold">
                         ダッシュボード
                     </h2>
@@ -70,7 +70,7 @@ export const Sidebar = () => {
                             startContent={item.icon}
                             className={`${
                                 pathname === item.key
-                                    ? "bg-success/10 text-success font-semibold"
+                                    ? "bg-primary/10 text-primary font-semibold"
                                     : ""
                             }`}
                         >

@@ -14,45 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      event_inventory: {
-        Row: {
-          event_id: string | null
-          id: string
-          remaining_quantity: number | null
-          total_quantity: number | null
-          variant_id: string | null
-        }
-        Insert: {
-          event_id?: string | null
-          id?: string
-          remaining_quantity?: number | null
-          total_quantity?: number | null
-          variant_id?: string | null
-        }
-        Update: {
-          event_id?: string | null
-          id?: string
-          remaining_quantity?: number | null
-          total_quantity?: number | null
-          variant_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_inventory_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "event_inventory_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "product_variants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       events: {
         Row: {
           created_at: string | null
@@ -73,6 +34,41 @@ export type Database = {
           slug?: string
         }
         Relationships: []
+      }
+      participants: {
+        Row: {
+          checked_in: boolean | null
+          full_name: string | null
+          id: string
+          race_id: string | null
+          runnet_id: string | null
+          tshirt_size: string | null
+        }
+        Insert: {
+          checked_in?: boolean | null
+          full_name?: string | null
+          id?: string
+          race_id?: string | null
+          runnet_id?: string | null
+          tshirt_size?: string | null
+        }
+        Update: {
+          checked_in?: boolean | null
+          full_name?: string | null
+          id?: string
+          race_id?: string | null
+          runnet_id?: string | null
+          tshirt_size?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participants_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_categories: {
         Row: {
@@ -176,6 +172,45 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      race_inventory: {
+        Row: {
+          id: string
+          race_id: string | null
+          remaining_quantity: number | null
+          total_quantity: number | null
+          variant_id: string | null
+        }
+        Insert: {
+          id?: string
+          race_id?: string | null
+          remaining_quantity?: number | null
+          total_quantity?: number | null
+          variant_id?: string | null
+        }
+        Update: {
+          id?: string
+          race_id?: string | null
+          remaining_quantity?: number | null
+          total_quantity?: number | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_inventory_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_inventory_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       race_statuses: {
         Row: {
