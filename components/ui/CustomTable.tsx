@@ -28,12 +28,13 @@ interface CustomTableProps<T> {
     initialVisibleColumns: string[];
     statusOptions?: { name: string; uid: string }[];
     renderCell: (item: T, columnKey: React.Key) => React.ReactNode;
-    onAdd: () => void;
+    onAdd?: () => void;
     onDelete: (ids: (string | number)[]) => void;
     onRowAction?: (key: React.Key) => void;
     searchLabel:string;
     selectedKeys: Selection;
     onSelectionChange: (keys: Selection) => void;
+    addButon?: boolean;
 }
 
 export function CustomTable<T extends { id: string }>({
@@ -49,6 +50,7 @@ export function CustomTable<T extends { id: string }>({
                                                                    searchLabel,
                                                                    selectedKeys,
                                                                    onSelectionChange,
+                                                                   addButon = true,
                                                                }: CustomTableProps<T>) {
     const [filterValue, setFilterValue] = React.useState("");
     const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(initialVisibleColumns));
@@ -168,7 +170,7 @@ export function CustomTable<T extends { id: string }>({
                             ))}
                         </DropdownMenu>
                     </Dropdown>
-                    <Button color="primary" endContent={<PlusIcon/>} onPress={onAdd}>追加</Button>
+                    { addButon && <Button color="primary" endContent={<PlusIcon/>} onPress={onAdd}>追加</Button>}
                     {count > 0 && (
                         <Button onPress={handlePrepareDelete} color="danger">
                             {count}件を削除

@@ -4,7 +4,7 @@ import {Tab, Tabs} from "@heroui/tabs";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {Card, CardBody, CardHeader} from "@heroui/card";
 import {useState, useTransition} from "react";
-import ParticipantsList from "@/components/races/ParticipantsList";
+import ParticipantsList from "@/components/participants/ParticipantsList";
 
 export default function RaceTabs ({ raceId }: { raceId: string }) {
     const router = useRouter();
@@ -47,7 +47,7 @@ export default function RaceTabs ({ raceId }: { raceId: string }) {
 
             <CardBody className="px-6 space-y-4">
                 {selected === "participants" && <ParticipantsList raceId={raceId}/>}
-                {selected === "b" && <p>Contenu de la Musique...</p>}
+                {selected === "b" && <ParticipantsList raceId={raceId}/>}
                 {selected === "inventory" && <p>Contenu des Vidéos...</p>}
             </CardBody>
         </Card>

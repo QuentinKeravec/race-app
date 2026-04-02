@@ -8,6 +8,7 @@ import {CustomBreadcrumbs} from "@/components/ui/CustomBreadcumbs";
 import {Metadata} from "next";
 import {createClient} from "@/utils/client";
 import RaceTabs from "@/components/races/RaceTabs";
+import ImportParticipants from "@/components/participants/ImportParticipants";
 
 interface RacePageProps {
     params: Promise<{ slug: string }>;
@@ -43,25 +44,16 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
                     />
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="flat" color="primary">Modifier</Button>
-                    <Button color="primary" shadow>Publier les résultats</Button>
+                    <ImportParticipants raceId={race?.id}/>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <Card className="border-none bg-primary/10 shadow-none">
                     <CardBody className="p-4">
                         <p className="text-small font-medium text-primary">Inscriptions</p>
                         <h3 className="text-2xl font-bold">842 / 1000</h3>
                         <Progress size="sm" value={84.2} color="primary" className="mt-2" />
-                    </CardBody>
-                </Card>
-
-                <Card className="border-none bg-success/10 shadow-none">
-                    <CardBody className="p-4">
-                        <p className="text-small font-medium text-success">Budget (Collecté)</p>
-                        <h3 className="text-2xl font-bold">¥1,250,000</h3>
-                        <p className="text-tiny text-success-600 mt-2">Target: ¥1.5M</p>
                     </CardBody>
                 </Card>
 
@@ -73,7 +65,7 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
                     </CardBody>
                 </Card>
 
-                <Card className="border-none bg-default-100 shadow-none">
+                <Card className="border-none bg-secondary/10 shadow-none">
                     <CardBody className="p-4">
                         <p className="text-small font-medium text-default-500">Status</p>
                         <div className="mt-1">

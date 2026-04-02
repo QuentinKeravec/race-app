@@ -32,7 +32,11 @@ export function AddEventForm({id, onClose, onLoadingChange}: AddEventFormProps) 
         }
     }, [eventName, setValue]);
 
-    const { mutate: createEvent } = useCreateEvent();
+    const { mutate: createEvent, isPending } = useCreateEvent();
+
+    useEffect(() => {
+        onLoadingChange(isPending);
+    }, [isPending, onLoadingChange]);
 
     const onSubmit = (data: EventFormValues) => {
         createEvent(data, {

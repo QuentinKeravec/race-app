@@ -3,7 +3,7 @@ import {title} from "@/components/primitives";
 import {Divider} from "@heroui/divider";
 import EventList from "@/components/events/EventList";
 import {createClient} from "@/utils/client";
-import { Metadata } from "next";
+import {Metadata} from "next";
 
 export const metadata: Metadata = {
     title: "イベント一覧",

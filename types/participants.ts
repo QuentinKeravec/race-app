@@ -15,3 +15,10 @@ export type TransformedParticipant = {
     checkedIn: boolean | null;
     raceId: string | null;
 }
+
+export type ParticipantCSV = {
+    runnet_id: string;
+    full_name: string;
+    tshirt_size: string;
+    checked_in: string;
+}

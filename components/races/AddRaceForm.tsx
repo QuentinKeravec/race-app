@@ -39,7 +39,11 @@ export function AddRaceForm({id, events, status, onClose, onLoadingChange}: AddR
         }
     }, [raceName, setValue]);
 
-    const { mutate: createRace } = useCreateRace();
+    const { mutate: createRace, isPending } = useCreateRace();
+
+    useEffect(() => {
+        onLoadingChange(isPending);
+    }, [isPending, onLoadingChange]);
 
     const onSubmit = (data: RaceFormValues) => {
         createRace(data, {

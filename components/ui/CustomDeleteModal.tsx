@@ -32,7 +32,7 @@ export function CustomDeleteModal({isOpen, onOpenChange, isLoading, ids, onDelet
                         </ModalBody>
                         <ModalFooter>
                             <Button onPress={onClose}>キャンセル</Button>
-                            <Button color="danger" onPress={onDelete}>削除する</Button>
+                            <Button color="danger" isLoading={isLoading} onPress={onDelete}>削除する</Button>
                         </ModalFooter>
                     </>
                 )}

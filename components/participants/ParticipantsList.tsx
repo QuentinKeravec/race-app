@@ -9,18 +9,14 @@ import {CustomTable} from "@/components/ui/CustomTable";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
 import {useDeleteRaces, useParticipants} from "@/hooks/useRaces";
-import {CustomEditModal} from "@/components/ui/CustomEditModal";
-import {AddParticipantForm} from "@/components/races/AddParticipantForm";
 
 interface RaceListProps {
     raceId: string;
 }
 
 export default function ParticipantsList({ raceId }: RaceListProps) {
-    const { isOpen: isAddOpen, onOpen: onAddOpen, onOpenChange: onAddChange, onClose: onAddClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteChange, onClose: onDeleteClose } = useDisclosure();
 
-    const [isFormLoading, setIsFormLoading] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
     const [isClient, setIsClient] = useState(false);
@@ -62,12 +58,11 @@ export default function ParticipantsList({ raceId }: RaceListProps) {
                 columns={[
                     { name: "氏名", uid: "fullName", sortable: true },
                     { name: "Runnet id", uid: "runnetId", sortable: true },
-                    { name: "Tシャツのサイズ", uid: "tShirtSize", sortable: true },
-                    { name: "チェックイン", uid: "checkIn", sortable: true },
+                    { name: "Tシャツのサイズ", uid: "tshirtSize", sortable: true },
+                    { name: "チェックイン", uid: "checkedIn", sortable: true },
                 ]}
                 searchKey="fullName"
-                initialVisibleColumns={["fullName", "runnetId", "tShirtSize", "checkIn"]}
-                onAdd={onAddOpen}
+                initialVisibleColumns={["fullName", "runnetId", "tshirtSize", "checkedIn"]}
                 onDelete={(ids) => {
                     const stringIds = ids.map(id => String(id));
 
@@ -75,21 +70,24 @@ export default function ParticipantsList({ raceId }: RaceListProps) {
                     onDeleteOpen();
                 }}
                 searchLabel="氏名"
+                addButon={false}
                 renderCell={(item: any, columnKey) => {
                     switch (columnKey) {
                         case "fullName":
                             return <p className="font-bold">{item.fullName}</p>;
                         case "event":
                             return <p className="font-bold">{item.eventName || "N/A"}</p>;
-                        case "status":
+                        case "tshirtSize":
+                            return <p className="font-bold">{item.tshirtSize}</p>;
+                        case "checkedIn":
                             return (
                                 <Chip
                                     className="capitalize"
-                                    color={item.status === "開催中" ? "success" : "danger"}
+                                    color={item.checkedIn === true ? "success" : "danger"}
                                     size="sm"
                                     variant="flat"
                                 >
-                                    {item.status}
+                                    {item.checkedIn === true ? "承認済み" : "未承認"}
                                 </Chip>
                             );
                         default:
@@ -97,20 +95,6 @@ export default function ParticipantsList({ raceId }: RaceListProps) {
                     }
                 }}
             />
-
-            <CustomEditModal
-                title="参加者を追加"
-                isOpen={isAddOpen}
-                onOpenChange={onAddChange}
-                formId="participant-form"
-                isLoading={isFormLoading}
-            >
-                <AddParticipantForm
-                    id="participant-form"
-                    onClose={onAddClose}
-                    onLoadingChange={setIsFormLoading}
-                />
-            </CustomEditModal>
 
             <CustomDeleteModal
                 isOpen={isDeleteOpen}
