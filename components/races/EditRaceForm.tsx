@@ -11,7 +11,7 @@ import React, {useEffect} from "react";
 import {toRomaji} from "wanakana";
 import {DatePicker} from "@heroui/date-picker";
 import {parseAbsoluteToLocal} from "@internationalized/date";
-import {useCreateRace} from "@/hooks/useRaces";
+import {useUpdateRace} from "@/hooks/useRaces";
 import {Button} from "@heroui/button";
 import {TransformedRace} from "@/types/race";
 
@@ -22,7 +22,7 @@ interface EditRaceFormProps {
 }
 
 export function EditRaceForm({race, events, status}: EditRaceFormProps) {
-    const {register, handleSubmit, setValue, formState: {errors}, reset, watch, control} = useForm<RaceFormValues>({
+    const {register, handleSubmit, setValue, formState: {errors}, watch, control} = useForm<RaceFormValues>({
         resolver: zodResolver(raceSchema),
         defaultValues: race,
     });
@@ -40,17 +40,16 @@ export function EditRaceForm({race, events, status}: EditRaceFormProps) {
         }
     }, [raceName, setValue]);
 
-    const { mutate: createRace, isPending } = useCreateRace();
+    const { mutate: updateRace, isPending } = useUpdateRace();
 
 
     const onSubmit = (data: RaceFormValues) => {
-        createRace(data, {
-            onSuccess: async (result) => {
-                if (!result?.error) {
-                    setTimeout(() => reset(), 300);
-                }
+        updateRace(
+            {
+                raceId: race.id,
+                data: data
             }
-        })
+        )
     };
 
     return (
@@ -145,6 +144,7 @@ export function EditRaceForm({race, events, status}: EditRaceFormProps) {
             <Button
                 color="success"
                 type="submit"
+                isLoading={isPending}
             >
                 確定
             </Button>

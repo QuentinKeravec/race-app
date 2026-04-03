@@ -8,7 +8,8 @@ import {Chip} from "@heroui/chip";
 import {CustomTable} from "@/components/ui/CustomTable";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
-import {useDeleteRaces, useParticipants} from "@/hooks/useRaces";
+import {useDeleteRaces} from "@/hooks/useRaces";
+import {useParticipants} from "@/hooks/useParticipants";
 
 interface RaceListProps {
     raceId: string;

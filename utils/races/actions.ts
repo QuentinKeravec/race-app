@@ -1,9 +1,9 @@
 'use server'
 
 import {createClient} from "@/utils/supabase/client";
-import {raceSchema} from "@/schemas/raceSchema";
+import {RaceFormValues, raceSchema} from "@/schemas/raceSchema";
 
-export async function createRaceAction(data: any) {
+export async function createRaceAction(data: RaceFormValues) {
     const supabase = createClient();
 
     const validatedFields = raceSchema.safeParse(data);
@@ -22,14 +22,51 @@ export async function createRaceAction(data: any) {
 
     const { error } = await supabase
         .from('races')
-        .insert([{
+        .insert({
             name: name,
             slug: slug,
             distance_meters: distanceMeters,
             start_time: startTime,
             event_id: eventId,
             status_id: statusId
-        }]);
+        });
+
+    if (error) {
+        console.error(error);
+        return { error: "データベースへの保存中にエラーが発生しました" };
+    }
+
+    return { success: true };
+}
+
+export async function updateRaceAction({ raceId, data }: { raceId: string, data: RaceFormValues }) {
+    const supabase = createClient();
+
+    const validatedFields = raceSchema.safeParse(data);
+    if (!validatedFields.success) {
+        return { error: "入力内容が正しくありません" };
+    }
+
+    const {
+        name,
+        slug,
+        distanceMeters,
+        startTime,
+        eventId,
+        statusId
+    } = validatedFields.data;
+
+    const { error } = await supabase
+        .from('races')
+        .update({
+            name: name,
+            slug: slug,
+            distance_meters: distanceMeters,
+            start_time: startTime,
+            event_id: eventId,
+            status_id: statusId
+        })
+        .eq('id', raceId);
 
     if (error) {
         console.error(error);
@@ -49,14 +86,3 @@ export async function deleteRacesAction(ids: string[]) {
 
     return { error: error?.message };
 }
-
-export async function getParticipantsAction() {
-    const supabase = createClient();
-    const { data, error } = await supabase
-        .from('participants')
-        .select(`*`);
-
-    if (error) throw new Error(error.message);
-    return data || [];
-}
-
