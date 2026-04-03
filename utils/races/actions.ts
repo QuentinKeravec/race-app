@@ -1,23 +1,7 @@
 'use server'
 
-import {createClient} from "@/utils/client";
+import {createClient} from "@/utils/supabase/client";
 import {raceSchema} from "@/schemas/raceSchema";
-
-export async function getRacesAction() {
-    const supabase = createClient();
-    const { data, error } = await supabase
-        .from('races')
-        .select(`
-                *,
-                events ( name ),
-                race_statuses ( id, label )
-        `)
-    ;
-
-    if (error) throw new Error(error.message);
-    return data || [];
-}
-
 
 export async function createRaceAction(data: any) {
     const supabase = createClient();

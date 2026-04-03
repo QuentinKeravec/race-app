@@ -2,7 +2,7 @@ import React from "react";
 import {title} from "@/components/primitives";
 import {Divider} from "@heroui/divider";
 import EventList from "@/components/events/EventList";
-import {createClient} from "@/utils/client";
+import {createClient} from "@/utils/supabase/client";
 import {Metadata} from "next";
 
 export const metadata: Metadata = {

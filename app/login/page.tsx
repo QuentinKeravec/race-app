@@ -2,7 +2,7 @@
 
 import React from "react";
 import {Card, CardHeader, CardBody } from "@heroui/card";
-import { createClient } from "@/utils/client";
+import { createClient } from "@/utils/supabase/client";
 import { Divider } from "@heroui/divider";
 import { title } from "@/components/primitives";
 import { Input } from "@heroui/input";

@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import Papa from 'papaparse';
-import {createClient} from "@/utils/client";
+import {createClient} from "@/utils/supabase/client";
 import {Button} from "@heroui/button";
 import {Upload} from "lucide-react";
 import {ParticipantCSV} from "@/types/participants";

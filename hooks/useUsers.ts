@@ -1,6 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {UserFormValues} from "@/schemas/userSchema";
-import {createClient} from "@/utils/client";
+import {createClient} from "@/utils/supabase/client";
 import {UserProfile} from "@/types/profile";
 import {addToast} from "@heroui/toast";
 

@@ -3,12 +3,13 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {addToast} from "@heroui/toast";
 import {Event} from "@/types/event";
-import {createEventAction, deleteEventsAction, getEventsAction} from "@/app/events/actions";
+import {createEventAction, deleteEventsAction} from "@/utils/events/actions";
+import {getEvents} from "@/utils/events/queries";
 
 export function useEvents(initialEvents?: Event[]) {
     return useQuery({
         queryKey: ["events"],
-        queryFn: () => getEventsAction(),
+        queryFn: () => getEvents(),
         initialData: initialEvents,
     });
 }

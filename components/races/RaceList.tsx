@@ -69,13 +69,13 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                 columns={[
                     { name: "名前", uid: "name", sortable: true },
                     { name: "イベント", uid: "event", sortable: true },
-                    { name: "開始時間", uid: "startTime", sortable: true },
+                    { name: "開始時間", uid: "displayDate", sortable: true },
                     { name: "距離 (km)", uid: "distanceMeters", sortable: true },
                     { name: "ステータス", uid: "status", sortable: true },
                 ]}
                 statusOptions={statusOptions}
                 searchKey="name"
-                initialVisibleColumns={["name", "event", "status", "distanceMeters", "startTime"]}
+                initialVisibleColumns={["name", "event", "status", "distanceMeters", "displayDate"]}
                 onAdd={onAddOpen}
                 onDelete={(ids) => {
                     const stringIds = ids.map(id => String(id));

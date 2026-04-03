@@ -5,16 +5,26 @@ import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {Card, CardBody, CardHeader} from "@heroui/card";
 import {useState, useTransition} from "react";
 import ParticipantsList from "@/components/participants/ParticipantsList";
+import {EditRaceForm} from "@/components/races/EditRaceForm";
+import {Event} from "@/types/event";
+import {Statuses} from "@/types/statuses";
+import {TransformedRace} from "@/types/race";
 
-export default function RaceTabs ({ raceId }: { raceId: string }) {
+interface RaceTabsProps {
+    race: TransformedRace;
+    events: Event[];
+    status: Statuses[];
+}
+
+export default function RaceTabs ({ race, events, status }: RaceTabsProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const currentTab = searchParams.get("tab") || "participants";
+    const initialTab = searchParams.get("tab") || "participants";
 
     const [isPending, startTransition] = useTransition();
-    const [selected, setSelected] = useState("participants");
+    const [selected, setSelected] = useState(initialTab);
 
     const handleTabChange = (key: React.Key) => {
         const tabKey = key.toString();
@@ -29,25 +39,25 @@ export default function RaceTabs ({ raceId }: { raceId: string }) {
     };
 
     return (
-        <Card className="lg:col-span-3">
+        <Card>
             <CardHeader className="flex justify-center px-6 py-4">
                 <Tabs
-                    selectedKey={currentTab}
+                    selectedKey={initialTab}
                     onSelectionChange={handleTabChange}
-                    disabledKeys={isPending ? ["participants", "inventory", "b"] : []}
+                    disabledKeys={isPending ? ["participants", "inventory", "infos"] : []}
                     color="primary"
                     classNames={{ tabList: "gap-6", cursor: "w-full" }}
                     radius="md"
                 >
                     <Tab key="participants" title="参加者" />
                     <Tab key="inventory" title="在庫" />
-                    <Tab key="b" title="Inventaire" />
+                    <Tab key="infos" title="詳細" />
                 </Tabs>
             </CardHeader>
 
             <CardBody className="px-6 space-y-4">
-                {selected === "participants" && <ParticipantsList raceId={raceId}/>}
-                {selected === "b" && <ParticipantsList raceId={raceId}/>}
+                {selected === "infos" && <EditRaceForm race={race} events={events} status={status}/>}
+                {selected === "participants" && <ParticipantsList raceId={race}/>}
                 {selected === "inventory" && <p>Contenu des Vidéos...</p>}
             </CardBody>
         </Card>

@@ -3,14 +3,15 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {addToast} from "@heroui/toast";
 import {TransformedRace} from "@/types/race";
-import {createRaceAction, deleteRacesAction, getParticipantsAction, getRacesAction} from "@/app/races/actions";
-import {transformRace, transformParticipant} from "@/utils/transformers";
+import {createRaceAction, deleteRacesAction, getParticipantsAction} from "@/utils/races/actions";
+import {getRaces} from "@/utils/races/queries";
+import {transformParticipant, transformRace} from "@/utils/transformers";
 
 export function useRaces(initialRaces?: TransformedRace[]) {
     return useQuery({
         queryKey: ["races"],
         queryFn: async () => {
-            const rawRaces = await getRacesAction();
+            const rawRaces = await getRaces();
             return rawRaces.map(transformRace);
         },
         initialData: initialRaces,

@@ -1,18 +1,7 @@
 'use server'
 
-import { createClient } from "@/utils/client";
+import { createClient } from "@/utils/supabase/client";
 import { eventSchema } from "@/schemas/eventSchema";
-
-export async function getEventsAction() {
-    const supabase = createClient();
-    const { data, error } = await supabase
-        .from('events')
-        .select('id, name, slug')
-        .order('name', { ascending: true });
-
-    if (error) throw new Error(error.message);
-    return data || [];
-}
 
 export async function createEventAction(data: any) {
     const supabase = createClient();

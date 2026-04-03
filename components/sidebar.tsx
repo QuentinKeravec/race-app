@@ -4,7 +4,7 @@ import React from "react";
 import {Listbox, ListboxItem} from "@heroui/listbox";
 import {Card} from "@heroui/card";
 import {usePathname, useRouter} from "next/navigation";
-import {createClient} from "@/utils/client";
+import {createClient} from "@/utils/supabase/client";
 import {ThemeSwitch} from "@/components/theme-switch";
 import {Balloon, LayoutGrid, LogOut, MapPinned, UserRound} from 'lucide-react';
 import NextLink from "next/link";

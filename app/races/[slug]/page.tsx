@@ -1,14 +1,13 @@
-import {Card, CardBody, CardHeader,} from "@heroui/card";
-import {Button} from "@heroui/button";
+import {Card, CardBody} from "@heroui/card";
 import {Progress} from "@heroui/progress";
 import {Chip} from "@heroui/chip";
-import {Divider} from "@heroui/divider";
-import {User} from "@heroui/user";
 import {CustomBreadcrumbs} from "@/components/ui/CustomBreadcumbs";
 import {Metadata} from "next";
-import {createClient} from "@/utils/client";
 import RaceTabs from "@/components/races/RaceTabs";
 import ImportParticipants from "@/components/participants/ImportParticipants";
+import {getRaceBySlug} from "@/utils/races/queries";
+import {getEvents} from "@/utils/events/queries";
+import {getStatuses} from "@/utils/statuses/queries";
 
 interface RacePageProps {
     params: Promise<{ slug: string }>;
@@ -16,8 +15,7 @@ interface RacePageProps {
 
 export async function generateMetadata({ params }: RacePageProps): Promise<Metadata> {
     const { slug } = await params;
-    const supabase = createClient();
-    const { data: race } = await supabase.from('races').select('id, name').eq('slug', slug).single();
+    const race = await getRaceBySlug(slug);
 
     return {
         title: race?.name,
@@ -28,11 +26,15 @@ export async function generateMetadata({ params }: RacePageProps): Promise<Metad
 export default async function RaceDetailsPage({ params }: RacePageProps) {
     const { slug } = await params;
 
-    const supabase = createClient();
-    const { data: race } = await supabase.from('races').select('id, name').eq('slug', slug).single();
+    const [race, events, status] = await Promise.all([
+        getRaceBySlug(slug),
+        getEvents(),
+        getStatuses()
+    ]);
+
 
     return (
-        <div className="max-w-7xl mx-auto p-6 space-y-8">
+        <div className="max-w-7xl mx-auto p-2 space-y-8">
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -76,32 +78,8 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
                 </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <Card>
-                    <CardHeader className="px-6 py-4">
-                        <h4 className="font-bold text-lg">Responsables Zone</h4>
-                    </CardHeader>
-                    <Divider />
-                    <CardBody className="px-6 space-y-6">
-                        <User
-                            name="Responsable Sécurité"
-                            description="Point de départ / Arrivée"
-                            avatarProps={{ src: "https://i.pravatar.cc/150?u=a042581f4e29026024d" }}
-                        />
-                        <User
-                            name="Chef Ravitaillement"
-                            description="KM 10 / KM 21"
-                            avatarProps={{ src: "https://i.pravatar.cc/150?u=a04258114e29026702d" }}
-                        />
-                        <User
-                            name="Coordinateur Bénévoles"
-                            description="Gestion des flux"
-                            avatarProps={{ src: "https://i.pravatar.cc/150?u=a04258114e29026708c" }}
-                        />
-                    </CardBody>
-                </Card>
-
-                {race && <RaceTabs raceId={race.id} />}
+            <div className="grid grid-cols-1 gap-6">
+                {race && <RaceTabs race={race} events={events} status={status}/>}
             </div>
         </div>
     );
