@@ -57,7 +57,7 @@ export default function RaceTabs ({ race, events, status }: RaceTabsProps) {
 
             <CardBody className="px-6 space-y-4">
                 {selected === "infos" && <EditRaceForm race={race} events={events} status={status}/>}
-                {selected === "participants" && <ParticipantsList raceId={race}/>}
+                {selected === "participants" && <ParticipantsList raceId={race.id}/>}
                 {selected === "inventory" && <p>Contenu des Vidéos...</p>}
             </CardBody>
         </Card>

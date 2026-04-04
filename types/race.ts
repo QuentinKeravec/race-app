@@ -2,10 +2,10 @@ export interface Race {
     id: string
     name: string
     slug: string
-    distance_meters: number | null
-    event_id: string | null
-    start_time: string | null
-    status_id: string | null
+    distance_meters: number
+    event_id: string
+    start_time: string
+    status_id: string
     events: {
         id: string,
         name: string
@@ -14,14 +14,14 @@ export interface Race {
 }
 
 export interface TransformedRace {
-    id: string;
-    name: string;
-    slug: string;
-    distanceMeters: number | null;
-    startTime: string | null;
-    displayDate: string | null;
-    eventId: string;
-    eventName: string;
-    status: string;
-    statusId: string | number;
+    id: string
+    name: string
+    slug: string
+    distanceMeters: number
+    startTime: string
+    displayDate: string
+    eventId: string
+    eventName: string
+    status: string
+    statusId: string
 }

@@ -37,26 +37,26 @@ export type Database = {
       }
       participants: {
         Row: {
-          checked_in: boolean | null
-          full_name: string | null
+          checked_in: boolean
+          full_name: string
           id: string
-          race_id: string | null
+          race_id: string
           runnet_id: string | null
           tshirt_size: string | null
         }
         Insert: {
-          checked_in?: boolean | null
-          full_name?: string | null
+          checked_in?: boolean
+          full_name: string
           id?: string
-          race_id?: string | null
+          race_id: string
           runnet_id?: string | null
           tshirt_size?: string | null
         }
         Update: {
-          checked_in?: boolean | null
-          full_name?: string | null
+          checked_in?: boolean
+          full_name?: string
           id?: string
-          race_id?: string | null
+          race_id?: string
           runnet_id?: string | null
           tshirt_size?: string | null
         }
@@ -229,31 +229,31 @@ export type Database = {
       }
       races: {
         Row: {
-          distance_meters: number | null
-          event_id: string | null
+          distance_meters: number
+          event_id: string
           id: string
           name: string
           slug: string
-          start_time: string | null
-          status_id: string | null
+          start_time: string
+          status_id: string
         }
         Insert: {
-          distance_meters?: number | null
-          event_id?: string | null
+          distance_meters: number
+          event_id: string
           id?: string
           name: string
           slug: string
-          start_time?: string | null
-          status_id?: string | null
+          start_time: string
+          status_id?: string
         }
         Update: {
-          distance_meters?: number | null
-          event_id?: string | null
+          distance_meters?: number
+          event_id?: string
           id?: string
           name?: string
           slug?: string
-          start_time?: string | null
-          status_id?: string | null
+          start_time?: string
+          status_id?: string
         }
         Relationships: [
           {

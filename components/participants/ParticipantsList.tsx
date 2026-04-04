@@ -50,7 +50,7 @@ export default function ParticipantsList({ raceId }: RaceListProps) {
                     setSelectedKeys(keys);
 
                     if (keys === "all") {
-                        setIdsToDelete(participants.map(r => String(r.id)));
+                        setIdsToDelete(participants?.map(r => String(r.id)) ?? []);
                     } else {
                         setIdsToDelete(Array.from(keys).map(k => String(k)));
                     }

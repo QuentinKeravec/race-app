@@ -84,7 +84,7 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                     onDeleteOpen();
                 }}
                 onRowAction={(id) => {
-                    const race = initialRaces.find(r => r.id.toString() === id.toString());
+                    const race = races?.find(r => r.id.toString() === id.toString());
                     if (race) {
                         router.push(`/races/${race.slug}`);
                     }

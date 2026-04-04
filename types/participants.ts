@@ -1,24 +1,24 @@
 export type Participant = {
-    full_name: string | null
+    full_name: string
     id: string
-    race_id: string | null
+    race_id: string
     runnet_id: string | null
     tshirt_size: string | null
-    checked_in: boolean | null
+    checked_in: boolean
 }
 
 export type TransformedParticipant = {
     id: string;
-    runnetId: string | null;
-    fullName: string | null;
-    tshirtSize: string | null;
-    checkedIn: boolean | null;
-    raceId: string | null;
+    runnetId: string | null
+    fullName: string
+    tshirtSize: string | null
+    checkedIn: boolean
+    raceId: string
 }
 
 export type ParticipantCSV = {
-    runnet_id: string;
-    full_name: string;
-    tshirt_size: string;
-    checked_in: string;
+    runnet_id: string
+    full_name: string
+    tshirt_size: string
+    checked_in: string
 }

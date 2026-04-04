@@ -21,8 +21,8 @@ export function transformRace(race: Race): TransformedRace {
         distanceMeters: race.distance_meters
             ? race.distance_meters / 1000
             : 0,
-        startTime: race.start_time ? new Date(race.start_time).toISOString() : null,
-        displayDate: race.start_time ? jaDateTimeFormatter.format(new Date(race.start_time)) : "不明",
+        startTime: new Date(race.start_time).toISOString(),
+        displayDate: jaDateTimeFormatter.format(new Date(race.start_time)),
         eventId: race.events?.id ? String(race.events.id) : "",
         eventName: event?.name ?? "不明",
         status: status?.label ?? "不明",

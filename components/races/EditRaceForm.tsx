@@ -42,7 +42,6 @@ export function EditRaceForm({race, events, status}: EditRaceFormProps) {
 
     const { mutate: updateRace, isPending } = useUpdateRace();
 
-
     const onSubmit = (data: RaceFormValues) => {
         updateRace(
             {
