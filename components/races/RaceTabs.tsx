@@ -39,7 +39,7 @@ export default function RaceTabs ({ race, events, status }: RaceTabsProps) {
     };
 
     return (
-        <Card>
+        <Card className="p-4">
             <CardHeader className="flex justify-center px-6 py-4">
                 <Tabs
                     selectedKey={initialTab}

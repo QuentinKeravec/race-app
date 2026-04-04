@@ -53,7 +53,7 @@ export function EditRaceForm({race, events, status}: EditRaceFormProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-4 py-5 px-20">
             <Input
                 {...register("name")}
                 isInvalid={!!errors.name}
@@ -100,9 +100,9 @@ export function EditRaceForm({race, events, status}: EditRaceFormProps) {
                 render={({ field: { onChange, value, ...field } }) => (
                     <Input
                         {...field}
-                        value={value?.toString() || ""}
+                        value={value.toString() || ""}
                         type="number"
-                        label="距離 (m)"
+                        label="距離 (km)"
                         isInvalid={!!errors.distanceMeters}
                         errorMessage={errors.distanceMeters?.message}
                         labelPlacement="outside"
@@ -142,9 +142,10 @@ export function EditRaceForm({race, events, status}: EditRaceFormProps) {
                 ))}
             </Select>
             <Button
-                color="success"
+                color="primary"
                 type="submit"
                 isLoading={isPending}
+                variant="shadow"
             >
                 確定
             </Button>

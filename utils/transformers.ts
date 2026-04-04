@@ -19,8 +19,8 @@ export function transformRace(race: Race): TransformedRace {
         name: race.name,
         slug: race.slug,
         distanceMeters: race.distance_meters
-            ? (race.distance_meters / 1000).toFixed(3)
-            : "0",
+            ? race.distance_meters / 1000
+            : 0,
         startTime: race.start_time ? new Date(race.start_time).toISOString() : null,
         displayDate: race.start_time ? jaDateTimeFormatter.format(new Date(race.start_time)) : "不明",
         eventId: race.events?.id ? String(race.events.id) : "",

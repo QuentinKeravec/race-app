@@ -70,7 +70,7 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                     { name: "名前", uid: "name", sortable: true },
                     { name: "イベント", uid: "event", sortable: true },
                     { name: "開始時間", uid: "displayDate", sortable: true },
-                    { name: "距離 (km)", uid: "distanceMeters", sortable: true },
+                    { name: "距離", uid: "distanceMeters", sortable: true },
                     { name: "ステータス", uid: "status", sortable: true },
                 ]}
                 statusOptions={statusOptions}
@@ -96,6 +96,8 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                             return <p className="font-bold">{item.name}</p>;
                         case "event":
                             return <p className="font-bold">{item.eventName || "N/A"}</p>;
+                        case "distanceMeters":
+                            return <span>{item.distanceMeters.toFixed(3)} km</span>
                         case "status":
                             return (
                                 <Chip

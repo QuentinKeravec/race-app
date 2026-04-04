@@ -25,7 +25,7 @@ export async function createRaceAction(data: RaceFormValues) {
         .insert({
             name: name,
             slug: slug,
-            distance_meters: distanceMeters,
+            distance_meters: Math.round(distanceMeters * 1000),
             start_time: startTime,
             event_id: eventId,
             status_id: statusId
@@ -61,7 +61,7 @@ export async function updateRaceAction({ raceId, data }: { raceId: string, data:
         .update({
             name: name,
             slug: slug,
-            distance_meters: distanceMeters,
+            distance_meters: Math.round(distanceMeters * 1000),
             start_time: startTime,
             event_id: eventId,
             status_id: statusId

@@ -106,7 +106,7 @@ export function AddRaceForm({id, events, status, onClose, onLoadingChange}: AddR
                         {...field}
                         value={value?.toString() || ""}
                         type="number"
-                        label="距離 (m)"
+                        label="距離 (km)"
                         isInvalid={!!errors.distanceMeters}
                         errorMessage={errors.distanceMeters?.message}
                         labelPlacement="outside"

@@ -17,7 +17,7 @@ export interface TransformedRace {
     id: string;
     name: string;
     slug: string;
-    distanceMeters: string | null;
+    distanceMeters: number | null;
     startTime: string | null;
     displayDate: string | null;
     eventId: string;

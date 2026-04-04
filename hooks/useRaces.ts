@@ -5,15 +5,11 @@ import {addToast} from "@heroui/toast";
 import {TransformedRace} from "@/types/race";
 import {createRaceAction, updateRaceAction, deleteRacesAction} from "@/utils/races/actions";
 import {getRaces} from "@/utils/races/queries";
-import {transformRace} from "@/utils/transformers";
 
 export function useRaces(initialRaces?: TransformedRace[]) {
     return useQuery({
         queryKey: ["races"],
-        queryFn: async () => {
-            const rawRaces = await getRaces();
-            return rawRaces.map(transformRace);
-        },
+        queryFn: () => getRaces(),
         initialData: initialRaces,
     });
 }
