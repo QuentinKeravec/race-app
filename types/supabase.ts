@@ -233,27 +233,33 @@ export type Database = {
           event_id: string
           id: string
           name: string
+          registrations: number
           slug: string
           start_time: string
           status_id: string
+          volunteers: number
         }
         Insert: {
           distance_meters: number
           event_id: string
           id?: string
           name: string
+          registrations: number
           slug: string
           start_time: string
           status_id?: string
+          volunteers: number
         }
         Update: {
           distance_meters?: number
           event_id?: string
           id?: string
           name?: string
+          registrations?: number
           slug?: string
           start_time?: string
           status_id?: string
+          volunteers?: number
         }
         Relationships: [
           {

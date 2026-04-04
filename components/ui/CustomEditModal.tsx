@@ -24,13 +24,15 @@ export function CustomEditModal({isOpen, onOpenChange, formId, children, title, 
             isOpen={isOpen}
             onOpenChange={onOpenChange}
             ref={targetRef}
+            size="lg"
+            scrollBehavior="inside"
         >
             <ModalContent>
                 {(onClose) => (
                     <>
                         <ModalHeader {...moveProps} className="flex flex-col gap-1">{title}</ModalHeader>
                         <Divider />
-                        <ModalBody className="p-4">
+                        <ModalBody className="px-8 py-4">
                             {children}
                         </ModalBody>
                         <Divider />

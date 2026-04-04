@@ -3,7 +3,7 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {addToast} from "@heroui/toast";
 import {TransformedRace} from "@/types/race";
-import {createRaceAction, updateRaceAction, deleteRacesAction} from "@/utils/races/actions";
+import {createRaceAction, deleteRacesAction, updateRaceAction} from "@/utils/races/actions";
 import {getRaces} from "@/utils/races/queries";
 
 export function useRaces(initialRaces?: TransformedRace[]) {

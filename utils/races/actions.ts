@@ -3,9 +3,9 @@
 import {createClient} from "@/utils/supabase/client";
 import {RaceFormValues, raceSchema} from "@/schemas/raceSchema";
 
-export async function createRaceAction(data: RaceFormValues) {
-    const supabase = createClient();
+const supabase = createClient();
 
+export async function createRaceAction(data: RaceFormValues) {
     const validatedFields = raceSchema.safeParse(data);
     if (!validatedFields.success) {
         return { error: "入力内容が正しくありません" };
@@ -17,7 +17,9 @@ export async function createRaceAction(data: RaceFormValues) {
         distanceMeters,
         startTime,
         eventId,
-        statusId
+        statusId,
+        registrations,
+        volunteers
     } = validatedFields.data;
 
     const { error } = await supabase
@@ -28,7 +30,9 @@ export async function createRaceAction(data: RaceFormValues) {
             distance_meters: Math.round(distanceMeters * 1000),
             start_time: startTime,
             event_id: eventId,
-            status_id: statusId
+            status_id: statusId,
+            registrations: registrations,
+            volunteers: volunteers
         });
 
     if (error) {
@@ -40,8 +44,6 @@ export async function createRaceAction(data: RaceFormValues) {
 }
 
 export async function updateRaceAction({ raceId, data }: { raceId: string, data: RaceFormValues }) {
-    const supabase = createClient();
-
     const validatedFields = raceSchema.safeParse(data);
     if (!validatedFields.success) {
         return { error: "入力内容が正しくありません" };
@@ -53,7 +55,9 @@ export async function updateRaceAction({ raceId, data }: { raceId: string, data:
         distanceMeters,
         startTime,
         eventId,
-        statusId
+        statusId,
+        registrations,
+        volunteers
     } = validatedFields.data;
 
     const { error } = await supabase
@@ -64,7 +68,9 @@ export async function updateRaceAction({ raceId, data }: { raceId: string, data:
             distance_meters: Math.round(distanceMeters * 1000),
             start_time: startTime,
             event_id: eventId,
-            status_id: statusId
+            status_id: statusId,
+            registrations: registrations,
+            volunteers: volunteers
         })
         .eq('id', raceId);
 
@@ -77,8 +83,6 @@ export async function updateRaceAction({ raceId, data }: { raceId: string, data:
 }
 
 export async function deleteRacesAction(ids: string[]) {
-    const supabase = createClient();
-
     const { error } = await supabase
         .from('races')
         .delete()

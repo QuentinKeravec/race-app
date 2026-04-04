@@ -8,7 +8,7 @@ import {Chip} from "@heroui/chip";
 import {CustomTable} from "@/components/ui/CustomTable";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
-import {useDeleteRaces} from "@/hooks/useRaces";
+import {useDeleteParticipants} from "@/hooks/useParticipants";
 import {useParticipants} from "@/hooks/useParticipants";
 
 interface RaceListProps {
@@ -27,10 +27,10 @@ export default function ParticipantsList({ raceId }: RaceListProps) {
     }, []);
 
     const { data: participants } = useParticipants(raceId);
-    const { mutate: deleteRaces, isPending } = useDeleteRaces();
+    const { mutate: deleteParticipants, isPending } = useDeleteParticipants(idsToDelete);
 
     const handleConfirmDelete = () => {
-        deleteRaces(idsToDelete, {
+        deleteParticipants(idsToDelete, {
             onSuccess: (result) => {
                 if (!result?.error) {
                     setSelectedKeys(new Set([]));

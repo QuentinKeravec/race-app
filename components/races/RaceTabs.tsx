@@ -21,7 +21,7 @@ export default function RaceTabs ({ race, events, status }: RaceTabsProps) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const initialTab = searchParams.get("tab") || "participants";
+    const initialTab = searchParams.get("tab") || "volunteers";
 
     const [isPending, startTransition] = useTransition();
     const [selected, setSelected] = useState(initialTab);
@@ -44,11 +44,12 @@ export default function RaceTabs ({ race, events, status }: RaceTabsProps) {
                 <Tabs
                     selectedKey={initialTab}
                     onSelectionChange={handleTabChange}
-                    disabledKeys={isPending ? ["participants", "inventory", "infos"] : []}
+                    disabledKeys={isPending ? ["volunteers", "participants", "inventory", "infos"] : []}
                     color="primary"
                     classNames={{ tabList: "gap-6", cursor: "w-full" }}
                     radius="md"
                 >
+                    <Tab key="volunteers" title="ボランティア" />
                     <Tab key="participants" title="参加者" />
                     <Tab key="inventory" title="在庫" />
                     <Tab key="infos" title="詳細" />
@@ -56,9 +57,10 @@ export default function RaceTabs ({ race, events, status }: RaceTabsProps) {
             </CardHeader>
 
             <CardBody className="px-6 space-y-4">
-                {selected === "infos" && <EditRaceForm race={race} events={events} status={status}/>}
+                {selected === "volunteers" && <ParticipantsList raceId={race.id}/>}
                 {selected === "participants" && <ParticipantsList raceId={race.id}/>}
                 {selected === "inventory" && <p>Contenu des Vidéos...</p>}
+                {selected === "infos" && <EditRaceForm race={race} events={events} status={status}/>}
             </CardBody>
         </Card>
     );

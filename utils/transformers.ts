@@ -13,6 +13,7 @@ export const jaDateTimeFormatter = new Intl.DateTimeFormat('ja-JP', {
 export function transformRace(race: Race): TransformedRace {
     const event = Array.isArray(race.events) ? race.events[0] : race.events;
     const status = Array.isArray(race.race_statuses) ? race.race_statuses[0] : race.race_statuses;
+    const participants = Array.isArray(race.participants) ? race.participants[0] : race.participants;
 
     return {
         id: race.id,
@@ -27,6 +28,9 @@ export function transformRace(race: Race): TransformedRace {
         eventName: event?.name ?? "不明",
         status: status?.label ?? "不明",
         statusId: status?.id ?? "",
+        registrations: race.registrations,
+        volunteers: race.volunteers,
+        participants: participants?.count,
     };
 }
 

@@ -1,16 +1,15 @@
 'use client'
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import Papa from 'papaparse';
-import {createClient} from "@/utils/supabase/client";
 import {Button} from "@heroui/button";
 import {Upload} from "lucide-react";
 import {ParticipantCSV} from "@/types/participants";
+import {useUpsertParticipants} from "@/hooks/useParticipants";
 
 export default function ImportParticipants({ raceId }: { raceId: string }) {
-    const supabase = createClient();
-    const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { mutate, isPending } = useUpsertParticipants();
 
     const handleButtonClick = () => {
         fileInputRef.current?.click();
@@ -19,8 +18,6 @@ export default function ImportParticipants({ raceId }: { raceId: string }) {
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
-
-        setUploading(true);
 
         Papa.parse<ParticipantCSV>(file, {
             header: true,
@@ -32,15 +29,11 @@ export default function ImportParticipants({ raceId }: { raceId: string }) {
                     checked_in: participant.checked_in === 'true'
                 }));
 
-                const { error } = await supabase
-                    .from('participants')
-                    .upsert(participantsToImport, { onConflict: 'race_id, runnet_id' });
-
-                if (error) alert("エラー : " + error.message);
-                else alert("インポートが完了しました");
-
-                setUploading(false);
-                if (fileInputRef.current) fileInputRef.current.value = "";
+                mutate(participantsToImport, {
+                    onSuccess: () => {
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                    }
+                });
             }
         });
     };
@@ -59,10 +52,10 @@ export default function ImportParticipants({ raceId }: { raceId: string }) {
                 color="primary"
                 variant="flat"
                 onPress={handleButtonClick}
-                isLoading={uploading}
-                startContent={!uploading && <Upload size={18} />}
+                isLoading={isPending}
+                startContent={!isPending && <Upload size={18} />}
             >
-                {uploading ? "Importation..." : "参加者をインポート(.csv)"}
+                {isPending ? "インポート中..." : "参加者をインポート(.csv)"}
             </Button>
         </div>
     );

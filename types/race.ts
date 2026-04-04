@@ -7,10 +7,15 @@ export interface Race {
     start_time: string
     status_id: string
     events: {
-        id: string,
+        id: string
         name: string
     } | null
     race_statuses: {} | null
+    registrations: number
+    volunteers: number
+    participants: {
+        count: number
+    }[]
 }
 
 export interface TransformedRace {
@@ -24,4 +29,7 @@ export interface TransformedRace {
     eventName: string
     status: string
     statusId: string
+    registrations: number
+    volunteers: number
+    participants: number
 }

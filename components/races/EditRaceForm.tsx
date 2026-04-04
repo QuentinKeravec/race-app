@@ -140,11 +140,50 @@ export function EditRaceForm({race, events, status}: EditRaceFormProps) {
                     <SelectItem key={item.id}>{item.label}</SelectItem>
                 ))}
             </Select>
+            <Controller
+                name="registrations"
+                control={control}
+                render={({ field: { onChange, value, ...field } }) => (
+                    <Input
+                        {...field}
+                        value={value?.toString() || ""}
+                        type="number"
+                        label="申し込み定員"
+                        isInvalid={!!errors.registrations}
+                        errorMessage={errors.registrations?.message}
+                        labelPlacement="outside"
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            onChange(val === "" ? 0 : Number(val));
+                        }}
+                    />
+                )}
+            />
+            <Controller
+                name="volunteers"
+                control={control}
+                render={({ field: { onChange, value, ...field } }) => (
+                    <Input
+                        {...field}
+                        value={value?.toString() || ""}
+                        type="number"
+                        label="ボランティア定員"
+                        isInvalid={!!errors.volunteers}
+                        errorMessage={errors.volunteers?.message}
+                        labelPlacement="outside"
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            onChange(val === "" ? 0 : Number(val));
+                        }}
+                    />
+                )}
+            />
             <Button
                 color="primary"
                 type="submit"
                 isLoading={isPending}
                 variant="shadow"
+                className="mt-6"
             >
                 確定
             </Button>

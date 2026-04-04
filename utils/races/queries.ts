@@ -11,6 +11,7 @@ export async function getRaces() {
         .from('races')
         .select(`
                 *,
+                participants:participants(count),
                 events ( id, name ),
                 race_statuses ( id, label )
         `)
@@ -25,6 +26,7 @@ export const getRaceBySlug = cache(async function getRaceBySlug(slug: string) {
         .from('races')
         .select(`
                 *,
+                participants:participants(count),
                 events ( id, name ),
                 race_statuses ( id, label )
         `)
