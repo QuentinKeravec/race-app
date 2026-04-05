@@ -3,13 +3,18 @@
 import {Card, CardBody} from "@heroui/card";
 import {Progress} from "@heroui/progress";
 import {useParticipantCount} from "@/hooks/useParticipants";
+import {CardSkeleton} from "@/components/ui/CardSkeleton";
 
 interface ParticipantCounterProps {
     raceId: string;
 }
 
 export default function ParticipantCounter({ raceId }: ParticipantCounterProps) {
-    const { data: race } = useParticipantCount(raceId);
+    const { data: race, isLoading } = useParticipantCount(raceId);
+
+    if (isLoading || !race) {
+        return <CardSkeleton />;
+    }
 
     const progressValue = race?.registrations
         ? (race.participants / race.registrations) * 100
