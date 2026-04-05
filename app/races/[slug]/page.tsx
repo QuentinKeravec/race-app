@@ -1,5 +1,4 @@
 import {Card, CardBody} from "@heroui/card";
-import {Progress} from "@heroui/progress";
 import {Chip} from "@heroui/chip";
 import {CustomBreadcrumbs} from "@/components/ui/CustomBreadcumbs";
 import {Metadata} from "next";
@@ -8,6 +7,8 @@ import ImportParticipants from "@/components/participants/ImportParticipants";
 import {getRaceBySlug} from "@/utils/races/queries";
 import {getEvents} from "@/utils/events/queries";
 import {getStatuses} from "@/utils/statuses/queries";
+import ParticipantCounter from "@/components/participants/ParticipantCounter";
+import {getParticipantsByRaceId} from "@/utils/participants/queries";
 
 interface RacePageProps {
     params: Promise<{ slug: string }>;
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: RacePageProps): Promise<Metad
     const race = await getRaceBySlug(slug);
 
     return {
-        title: race?.name,
+        title: "レース一覧 > " + race?.name,
         description: `Détails et gestion de la course : ${race?.name}.`
     };
 }
@@ -29,8 +30,10 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
     const [race, events, status] = await Promise.all([
         getRaceBySlug(slug),
         getEvents(),
-        getStatuses()
+        getStatuses(),
     ]);
+
+    const participants = await getParticipantsByRaceId(race.id);
 
 
     return (
@@ -46,18 +49,12 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
                     />
                 </div>
                 <div className="flex gap-3">
-                    <ImportParticipants raceId={race?.id}/>
+                    <ImportParticipants raceId={race?.id} existingParticipants={participants}/>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <Card className="border-none bg-primary/40 shadow-none">
-                    <CardBody className="p-4">
-                        <p className="text-small font-medium text-primary">申込者数</p>
-                        <h3 className="text-2xl font-bold">{race.participants} / {race.registrations} 名</h3>
-                        <Progress size="sm" value={84.2} color="primary" className="mt-2" />
-                    </CardBody>
-                </Card>
+                <ParticipantCounter raceId={race.id}/>
 
                 <Card className="border-none bg-warning/40 shadow-none">
                     <CardBody className="p-4">

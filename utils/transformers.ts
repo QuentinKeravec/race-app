@@ -44,3 +44,12 @@ export function transformParticipant(participant: Participant): TransformedParti
         raceId: participant.race_id,
     };
 }
+
+export function transformCountRace(race: { registrations: number, participants: { count: number }[] }): { registrations: number, participants: number } {
+    const participants = Array.isArray(race.participants) ? race.participants[0] : race.participants;
+
+    return {
+        registrations: race.registrations,
+        participants: participants?.count,
+    };
+}

@@ -14,8 +14,7 @@ export async function getRaces() {
                 participants:participants(count),
                 events ( id, name ),
                 race_statuses ( id, label )
-        `)
-    ;
+        `);
 
     if (error) throw new Error(error.message);
     return data.map(transformRace) || [];
@@ -31,8 +30,7 @@ export const getRaceBySlug = cache(async function getRaceBySlug(slug: string) {
                 race_statuses ( id, label )
         `)
         .eq('slug', slug)
-        .single()
-    ;
+        .single();
 
     if (error) throw new Error(error.message);
     return transformRace(data) || [];

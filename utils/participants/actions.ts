@@ -1,36 +1,41 @@
 'use server'
 
 import {createClient} from "@/utils/supabase/client";
-import { revalidatePath } from 'next/cache';
+import {ParticipantImport} from "@/types/participants";
 
 const supabase = createClient();
 
-export async function deleteParticipantsAction(ids: string[]) {
+export async function deleteParticipantsAction({
+    raceId,
+    ids
+}: {
+    raceId: string,
+    ids: string[]
+}) {
     const { error } = await supabase
         .from('participants')
         .delete()
         .in('id', ids);
 
-    if (!error) {
-        revalidatePath('/races/[slug]', 'page');
-    }
-
     return { error: error?.message };
 }
 
-export async function upsertParticipantsAction(data: any) {
+export async function upsertParticipantsAction({
+    raceId,
+    data
+}: {
+    raceId: string,
+    data: ParticipantImport[]
+}) {
     const { error } = await supabase
         .from('participants')
         .upsert(data, { onConflict: 'race_id, runnet_id' });
 
-    if (!error) {
-        revalidatePath('/races/[slug]', 'page');
-    }
-
     if (error) {
-        console.error(error);
         return { error: "データベースへの保存中にエラーが発生しました" };
     }
 
-    return { success: true };
+    return {
+        success: true,
+    };
 }

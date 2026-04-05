@@ -22,3 +22,11 @@ export type ParticipantCSV = {
     tshirt_size: string
     checked_in: string
 }
+
+export type ParticipantImport = {
+    full_name: string
+    race_id: string
+    runnet_id: string | null
+    tshirt_size: string | null
+    checked_in: boolean
+}

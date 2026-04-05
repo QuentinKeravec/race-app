@@ -1,7 +1,7 @@
 'use server'
 
 import {createClient} from "@/utils/supabase/client";
-import {transformParticipant} from "@/utils/transformers";
+import {transformCountRace, transformParticipant} from "@/utils/transformers";
 
 const supabase = createClient();
 
@@ -14,4 +14,18 @@ export async function getParticipantsByRaceId(raceId: string) {
 
     if (error) throw new Error(error.message);
     return (data.map(transformParticipant)) || [];
+}
+
+export async function getParticipantCount(raceId: string) {
+    const { data, error } = await supabase
+        .from('races')
+        .select(`
+                registrations,
+                participants:participants(count)
+        `)
+        .eq('id', raceId)
+        .single();
+
+    if (error) throw new Error(error.message);
+    return transformCountRace(data);
 }

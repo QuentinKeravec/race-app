@@ -27,10 +27,10 @@ export default function ParticipantsList({ raceId }: RaceListProps) {
     }, []);
 
     const { data: participants } = useParticipants(raceId);
-    const { mutate: deleteParticipants, isPending } = useDeleteParticipants(idsToDelete);
+    const { mutate: deleteParticipants, isPending } = useDeleteParticipants();
 
     const handleConfirmDelete = () => {
-        deleteParticipants(idsToDelete, {
+        deleteParticipants({raceId, ids: idsToDelete}, {
             onSuccess: (result) => {
                 if (!result?.error) {
                     setSelectedKeys(new Set([]));
