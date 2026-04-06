@@ -11,7 +11,7 @@ export const CardSkeleton = () => {
                     <Skeleton className="w-12 h-5 rounded-lg" />
                 </div>
                 <div className="mt-3">
-                    <Skeleton className="w-full h-2 rounded-full" />
+                    <Skeleton className="w-full h-3 rounded-full" />
                 </div>
             </CardBody>
         </Card>

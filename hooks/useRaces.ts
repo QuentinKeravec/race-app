@@ -63,6 +63,7 @@ export function useUpdateRace() {
             }
 
             queryClient.invalidateQueries({ queryKey: ["races"] });
+            queryClient.invalidateQueries({ queryKey: ["participants", variables.raceId] });
 
             addToast({
                 title: "作成完了",

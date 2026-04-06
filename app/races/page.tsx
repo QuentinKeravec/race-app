@@ -25,7 +25,7 @@ export default async function RacesPage() {
 
     return (
         <section className="flex flex-col gap-6">
-            <div className="flex flex-col items-start gap-2 px-2">
+            <div className="flex flex-col items-start px-2">
                 <h1 className={title({ size: "sm" })}>
                     レース一覧
                 </h1>

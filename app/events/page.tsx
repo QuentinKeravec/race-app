@@ -22,8 +22,8 @@ export default async function EventsPage() {
     const events = eventsRes.data || [];
 
     return (
-        <section className="flex flex-col gap-6 py-8">
-            <div className="flex flex-col items-start gap-2 px-2">
+        <section className="flex flex-col gap-6">
+            <div className="flex flex-col items-start px-2">
                 <h1 className={title({size: "sm"})}>
                     イベント一覧
                 </h1>
