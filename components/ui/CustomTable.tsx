@@ -34,7 +34,9 @@ interface CustomTableProps<T> {
     searchLabel:string;
     selectedKeys: Selection;
     onSelectionChange: (keys: Selection) => void;
-    addButon?: boolean;
+    addButton?: boolean;
+    sortButtonLabel?:string;
+    filterKey?: string;
 }
 
 export function CustomTable<T extends { id: string }>({
@@ -50,7 +52,9 @@ export function CustomTable<T extends { id: string }>({
                                                                    searchLabel,
                                                                    selectedKeys,
                                                                    onSelectionChange,
-                                                                   addButon = true,
+                                                                   addButton = true,
+                                                                   sortButtonLabel,
+                                                                   filterKey = "statusId"
                                                                }: CustomTableProps<T>) {
     const [filterValue, setFilterValue] = React.useState("");
     const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(initialVisibleColumns));
@@ -76,8 +80,10 @@ export function CustomTable<T extends { id: string }>({
         }
 
         if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
+            const selectedValues = Array.from(statusFilter);
+
             filteredItems = filteredItems.filter((item) =>
-                Array.from(statusFilter).includes((item as any).statusId),
+                selectedValues.includes((item as any)[filterKey]),
             );
         }
 
@@ -133,7 +139,7 @@ export function CustomTable<T extends { id: string }>({
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button endContent={<ChevronDownIcon className="text-small"/>} variant="flat">
-                                    ステータス
+                                    { sortButtonLabel ? sortButtonLabel : "ステータス" }
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -170,7 +176,7 @@ export function CustomTable<T extends { id: string }>({
                             ))}
                         </DropdownMenu>
                     </Dropdown>
-                    { addButon && <Button color="primary" endContent={<PlusIcon/>} onPress={onAdd}>追加</Button>}
+                    { addButton && <Button color="primary" endContent={<PlusIcon/>} onPress={onAdd}>追加</Button>}
                     {count > 0 && (
                         <Button onPress={handlePrepareDelete} color="danger">
                             {count}件を削除

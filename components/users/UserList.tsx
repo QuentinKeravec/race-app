@@ -1,29 +1,27 @@
 'use client';
 
 import React, {useEffect, useState} from "react";
-import {useRouter} from "next/navigation";
 import {Selection} from "@heroui/table";
 import {useDisclosure} from "@heroui/modal";
-import {Chip} from "@heroui/chip";
+import {User} from "@heroui/user";
 
 import {CustomTable} from "@/components/ui/CustomTable";
 import {CustomEditModal} from "@/components/ui/CustomEditModal";
-import {AddRaceForm} from "@/components/races/AddRaceForm";
+import {AddUserForm} from "@/components/users/AddUserForm";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
-import {Tables} from "@/types/supabase";
-import {TransformedRace} from "@/types/race";
-import {useDeleteRaces, useRaces} from "@/hooks/useRaces";
+import {TransformedUser} from "@/types/profile";
+import {useDeleteUsers, useUsers} from "@/hooks/useUsers";
+import {Chip} from "@heroui/chip";
 
-interface RaceListProps {
-    initialRaces: TransformedRace[];
-    events: Tables<"events">[];
-    statuses: Tables<"race_statuses">[];
-    statusOptions: { name: string; uid: string }[];
+
+interface UserListProps {
+    initialUsers: TransformedUser[];
+    roles: { id: string, label: string }[];
+    roleOptions: { name: string; uid: string }[];
 }
 
-export default function RaceList({ initialRaces, events, statuses, statusOptions }: RaceListProps) {
-    const router = useRouter();
+export default function UserList({ initialUsers, roles, roleOptions }: UserListProps) {
     const { isOpen: isAddOpen, onOpen: onAddOpen, onOpenChange: onAddChange, onClose: onAddClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteChange, onClose: onDeleteClose } = useDisclosure();
 
@@ -36,19 +34,29 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
         setIsClient(true);
     }, []);
 
-    const { data: races } = useRaces(initialRaces);
-    const { mutate: deleteRaces, isPending } = useDeleteRaces();
+    const { data: users } = useUsers(initialUsers);
+    const { mutate: deleteUsers, isPending } = useDeleteUsers();
 
-    const handleConfirmDelete = () => {
-        deleteRaces(idsToDelete, {
+    const handleConfirmDelete = async () => {
+        if (!users) return;
+
+        let usersToDelete: TransformedUser[];
+
+        if (selectedKeys === "all") {
+            usersToDelete = users;
+        } else {
+            usersToDelete = users?.filter((u) => selectedKeys.has(u.id));
+        }
+
+        if (usersToDelete.length === 0) return;
+
+        deleteUsers(usersToDelete, {
             onSuccess: (result) => {
-                if (!result?.error) {
-                    setSelectedKeys(new Set([]));
-                    onDeleteClose();
-                }
+                setSelectedKeys(new Set([]));
+                onDeleteClose();
             }
         });
-    };
+    }
 
     if (!isClient) return <TableSkeleton />;
 
@@ -60,22 +68,19 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                     setSelectedKeys(keys);
 
                     if (keys === "all") {
-                        setIdsToDelete(initialRaces.map(r => String(r.id)));
+                        setIdsToDelete(initialUsers.map(r => String(r.id)));
                     } else {
                         setIdsToDelete(Array.from(keys).map(k => String(k)));
                     }
                 }}
-                data={races||[]}
+                data={users}
                 columns={[
-                    { name: "名前", uid: "name", sortable: true },
-                    { name: "イベント", uid: "event", sortable: true },
-                    { name: "開始時間", uid: "displayDate", sortable: true },
-                    { name: "距離", uid: "distanceMeters", sortable: true },
-                    { name: "ステータス", uid: "status", sortable: true },
+                    {name: "ユーザー", uid: "fullName", sortable: true},
+                    {name: "ロール", uid: "userRole", sortable: true},
                 ]}
-                statusOptions={statusOptions}
-                searchKey="name"
-                initialVisibleColumns={["name", "event", "status", "distanceMeters", "displayDate"]}
+                statusOptions={roleOptions}
+                searchKey="fullName"
+                initialVisibleColumns={["fullName", "userRole"]}
                 onAdd={onAddOpen}
                 onDelete={(ids) => {
                     const stringIds = ids.map(id => String(id));
@@ -83,49 +88,50 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                     setIdsToDelete(stringIds);
                     onDeleteOpen();
                 }}
-                onRowAction={(id) => {
-                    const race = races?.find(r => r.id.toString() === id.toString());
-                    if (race) {
-                        router.push(`/races/${race.slug}`);
-                    }
-                }}
                 searchLabel="名前"
-                renderCell={(item: any, columnKey) => {
+                renderCell={(item, columnKey) => {
+                    const cellValue = (item as Record<string, any>)[columnKey as string];
+
                     switch (columnKey) {
-                        case "name":
-                            return <p className="font-bold">{item.name}</p>;
-                        case "event":
-                            return <p className="font-bold">{item.eventName || "N/A"}</p>;
-                        case "distanceMeters":
-                            return <span>{item.distanceMeters.toFixed(3)} km</span>
-                        case "status":
+                        case "fullName":
+                            return (
+                                <User
+                                    avatarProps={{radius: "lg", src: item.avatarUrl ?? undefined}}
+                                    description={item.email}
+                                    name={cellValue}
+                                >
+                                    {item.email}
+                                </User>
+                            );
+                        case "userRole":
                             return (
                                 <Chip
                                     className="capitalize"
-                                    color={item.status === "開催中" ? "success" : "danger"}
+                                    color={item.userRole === "管理者" ? "primary" : "warning"}
                                     size="md"
                                     variant="flat"
                                 >
-                                    {item.status}
+                                    {item.userRole}
                                 </Chip>
                             );
                         default:
-                            return item[columnKey as string];
+                            return cellValue;
                     }
                 }}
+                sortButtonLabel="ロール"
+                filterKey="roleId"
             />
 
             <CustomEditModal
                 title="レースを追加"
                 isOpen={isAddOpen}
                 onOpenChange={onAddChange}
-                formId="race-form"
+                formId="user-form"
                 isLoading={isFormLoading}
             >
-                <AddRaceForm
-                    id="race-form"
-                    events={events}
-                    status={statuses}
+                <AddUserForm
+                    id="user-form"
+                    roles={roles}
                     onClose={onAddClose}
                     onLoadingChange={setIsFormLoading}
                 />

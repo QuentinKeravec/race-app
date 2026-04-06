@@ -1,5 +1,6 @@
 import {Race, TransformedRace} from "@/types/race";
 import {Participant, TransformedParticipant} from "@/types/participants";
+import {TransformedUser, UserProfile, Volunteer, TransformedVolunteer} from "@/types/profile";
 
 export const jaDateTimeFormatter = new Intl.DateTimeFormat('ja-JP', {
     year: 'numeric',
@@ -51,5 +52,40 @@ export function transformCountRace(race: { registrations: number, participants: 
     return {
         registrations: race.registrations,
         participants: participants?.count,
+    };
+}
+
+export function transformUser(user: UserProfile): TransformedUser {
+    const role = Array.isArray(user.roles) ? user.roles[0] : user.roles;
+
+    return {
+        id: user.id,
+        email: user.email,
+        fullName: user.full_name,
+        avatarUrl: user.avatar_url,
+        roleId: user.role_id,
+        userRole: role.label ?? "不明",
+    };
+}
+
+export function transformCountVolunteer(race: { volunteers: number, race_volunteers: { count: number }[] }): { volunteers: number, raceVolunteers: number } {
+    const raceVolunteers = Array.isArray(race.race_volunteers) ? race.race_volunteers[0] : race.race_volunteers;
+
+    return {
+        volunteers: race.volunteers,
+        raceVolunteers: raceVolunteers?.count,
+    };
+}
+
+export function transformVolunteer(volunteer: Volunteer): TransformedVolunteer {
+    const volunteerData = Array.isArray(volunteer.profiles) ? volunteer.profiles[0] : volunteer.profiles;
+
+    return {
+        id: volunteer.id,
+        raceId: volunteer.race_id,
+        volunteerId: volunteer.volunteer_id,
+        fullName: volunteerData.full_name,
+        email: volunteerData.email,
+        avatarUrl: volunteerData.avatar_url,
     };
 }

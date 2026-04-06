@@ -9,13 +9,17 @@ import {CustomTable} from "@/components/ui/CustomTable";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
 import {useDeleteParticipants} from "@/hooks/useParticipants";
-import {useParticipants} from "@/hooks/useParticipants";
+import {useVolunteers} from "@/hooks/useUsers";
+import {User} from "@heroui/user";
+import {CustomEditModal} from "@/components/ui/CustomEditModal";
+import {AddUserForm} from "@/components/users/AddUserForm";
 
-interface ParticipantsListProps {
+interface VolunteersListProps {
     raceId: string;
 }
 
-export default function ParticipantsList({ raceId }: ParticipantsListProps) {
+export default function VolunteersList({ raceId }: VolunteersListProps) {
+    const { isOpen: isAddOpen, onOpen: onAddOpen, onOpenChange: onAddChange, onClose: onAddClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteChange, onClose: onDeleteClose } = useDisclosure();
 
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
@@ -26,7 +30,7 @@ export default function ParticipantsList({ raceId }: ParticipantsListProps) {
         setIsClient(true);
     }, []);
 
-    const { data: participants } = useParticipants(raceId);
+    const { data: volunteers } = useVolunteers(raceId);
     const { mutate: deleteParticipants, isPending } = useDeleteParticipants();
 
     const handleConfirmDelete = () => {
@@ -50,51 +54,45 @@ export default function ParticipantsList({ raceId }: ParticipantsListProps) {
                     setSelectedKeys(keys);
 
                     if (keys === "all") {
-                        setIdsToDelete(participants?.map(r => String(r.id)) ?? []);
+                        setIdsToDelete(volunteers.map(r => String(r.id)));
                     } else {
                         setIdsToDelete(Array.from(keys).map(k => String(k)));
                     }
                 }}
-                data={participants||[]}
+                data={volunteers || []}
                 columns={[
-                    { name: "氏名", uid: "fullName", sortable: true },
-                    { name: "Runnet id", uid: "runnetId", sortable: true },
-                    { name: "Tシャツのサイズ", uid: "tshirtSize", sortable: true },
-                    { name: "チェックイン", uid: "checkedIn", sortable: true },
+                    {name: "ボランティア", uid: "fullName", sortable: true},
                 ]}
                 searchKey="fullName"
-                initialVisibleColumns={["fullName", "runnetId", "tshirtSize", "checkedIn"]}
+                initialVisibleColumns={["fullName"]}
+                onAdd={onAddOpen}
                 onDelete={(ids) => {
                     const stringIds = ids.map(id => String(id));
 
                     setIdsToDelete(stringIds);
                     onDeleteOpen();
                 }}
-                searchLabel="氏名"
-                addButton={false}
-                renderCell={(item: any, columnKey) => {
+                searchLabel="名前"
+                renderCell={(item, columnKey) => {
+                    const cellValue = (item as Record<string, any>)[columnKey as string];
+
                     switch (columnKey) {
                         case "fullName":
-                            return <p className="font-bold">{item.fullName}</p>;
-                        case "event":
-                            return <p className="font-bold">{item.eventName || "N/A"}</p>;
-                        case "tshirtSize":
-                            return <p className="font-bold">{item.tshirtSize}</p>;
-                        case "checkedIn":
                             return (
-                                <Chip
-                                    className="capitalize"
-                                    color={item.checkedIn === true ? "success" : "danger"}
-                                    size="sm"
-                                    variant="flat"
+                                <User
+                                    avatarProps={{radius: "lg", src: item.avatarUrl ?? undefined}}
+                                    description={item.email}
+                                    name={cellValue}
                                 >
-                                    {item.checkedIn === true ? "承認済み" : "未承認"}
-                                </Chip>
+                                    {item.email}
+                                </User>
                             );
                         default:
-                            return item[columnKey as string];
+                            return cellValue;
                     }
                 }}
+                sortButtonLabel="ロール"
+                filterKey="roleId"
             />
 
             <CustomDeleteModal

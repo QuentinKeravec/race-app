@@ -152,6 +152,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          role_id: string
           updated_at: string | null
           username: string | null
         }
@@ -160,6 +161,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          role_id?: string
           updated_at?: string | null
           username?: string | null
         }
@@ -168,10 +170,19 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          role_id?: string
           updated_at?: string | null
           username?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       race_inventory: {
         Row: {
@@ -227,6 +238,42 @@ export type Database = {
         }
         Relationships: []
       }
+      race_volunteers: {
+        Row: {
+          created_at: string
+          id: string
+          race_id: string | null
+          volunteer_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          race_id?: string | null
+          volunteer_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          race_id?: string | null
+          volunteer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_volunteers_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_volunteers_volunteer_id_fkey"
+            columns: ["volunteer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       races: {
         Row: {
           distance_meters: number
@@ -277,6 +324,21 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      roles: {
+        Row: {
+          id: string
+          label: string
+        }
+        Insert: {
+          id: string
+          label: string
+        }
+        Update: {
+          id?: string
+          label?: string
+        }
+        Relationships: []
       }
     }
     Views: {

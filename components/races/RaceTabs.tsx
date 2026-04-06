@@ -5,6 +5,7 @@ import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {Card, CardBody, CardHeader} from "@heroui/card";
 import {useState, useTransition} from "react";
 import ParticipantsList from "@/components/participants/ParticipantsList";
+import VolunteersList from "@/components/users/VolunteersList";
 import {EditRaceForm} from "@/components/races/EditRaceForm";
 import {Event} from "@/types/event";
 import {Statuses} from "@/types/statuses";
@@ -57,7 +58,7 @@ export default function RaceTabs ({ race, events, status }: RaceTabsProps) {
             </CardHeader>
 
             <CardBody className="px-6 space-y-4">
-                {selected === "volunteers" && <ParticipantsList raceId={race.id}/>}
+                {selected === "volunteers" && <VolunteersList raceId={race.id}/>}
                 {selected === "participants" && <ParticipantsList raceId={race.id}/>}
                 {selected === "inventory" && <p>Contenu des Vidéos...</p>}
                 {selected === "infos" && <EditRaceForm race={race} events={events} status={status}/>}

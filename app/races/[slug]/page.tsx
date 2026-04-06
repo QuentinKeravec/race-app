@@ -9,6 +9,7 @@ import {getEvents} from "@/utils/events/queries";
 import {getStatuses} from "@/utils/statuses/queries";
 import ParticipantCounter from "@/components/participants/ParticipantCounter";
 import {getParticipantsByRaceId} from "@/utils/participants/queries";
+import VolunteerCounter from "@/components/users/VolunteerCounter";
 
 interface RacePageProps {
     params: Promise<{ slug: string }>;
@@ -54,15 +55,8 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <ParticipantCounter raceId={race.id}/>
-
-                <Card className="border-none bg-warning/40 shadow-none">
-                    <CardBody className="p-4">
-                        <p className="text-small font-medium text-warning">ボランティア人数</p>
-                        <h3 className="text-2xl font-bold">0 / {race.volunteers} 名</h3>
-                        <p className="text-tiny text-warning-600 mt-2">18 manquants</p>
-                    </CardBody>
-                </Card>
+                <ParticipantCounter raceId={race.id} />
+                <VolunteerCounter raceId={race.id} />
 
                 <Card className="border-none bg-danger/40 shadow-none">
                     <CardBody className="p-4">

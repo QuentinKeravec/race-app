@@ -13,7 +13,7 @@ export default function ParticipantCounter({ raceId }: ParticipantCounterProps) 
     const { data: race, isLoading } = useParticipantCount(raceId);
 
     if (isLoading || !race) {
-        return <CardSkeleton />;
+        return <CardSkeleton bgColor="primary"/>;
     }
 
     const progressValue = race?.registrations
