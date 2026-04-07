@@ -3,16 +3,15 @@
 import React, {useEffect, useState} from "react";
 import {Selection} from "@heroui/table";
 import {useDisclosure} from "@heroui/modal";
-import {Chip} from "@heroui/chip";
 
 import {CustomTable} from "@/components/ui/CustomTable";
 import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
-import {useDeleteParticipants} from "@/hooks/useParticipants";
-import {useVolunteers} from "@/hooks/useUsers";
+import {useDeleteVolunteers} from "@/hooks/useUsers";
+import {useVolunteersByRaceId} from "@/hooks/useUsers";
 import {User} from "@heroui/user";
 import {CustomEditModal} from "@/components/ui/CustomEditModal";
-import {AddUserForm} from "@/components/users/AddUserForm";
+import {AddVolunteerForm} from "@/components/users/AddVolunteerForm";
 
 interface VolunteersListProps {
     raceId: string;
@@ -22,6 +21,7 @@ export default function VolunteersList({ raceId }: VolunteersListProps) {
     const { isOpen: isAddOpen, onOpen: onAddOpen, onOpenChange: onAddChange, onClose: onAddClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteChange, onClose: onDeleteClose } = useDisclosure();
 
+    const [isFormLoading, setIsFormLoading] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
     const [isClient, setIsClient] = useState(false);
@@ -30,11 +30,11 @@ export default function VolunteersList({ raceId }: VolunteersListProps) {
         setIsClient(true);
     }, []);
 
-    const { data: volunteers } = useVolunteers(raceId);
-    const { mutate: deleteParticipants, isPending } = useDeleteParticipants();
+    const { data: volunteers } = useVolunteersByRaceId(raceId);
+    const { mutate: deleteVolunteers, isPending } = useDeleteVolunteers();
 
     const handleConfirmDelete = () => {
-        deleteParticipants({raceId, ids: idsToDelete}, {
+        deleteVolunteers({raceId, ids: idsToDelete}, {
             onSuccess: (result) => {
                 if (!result?.error) {
                     setSelectedKeys(new Set([]));
@@ -94,6 +94,22 @@ export default function VolunteersList({ raceId }: VolunteersListProps) {
                 sortButtonLabel="ロール"
                 filterKey="roleId"
             />
+
+            <CustomEditModal
+                title="ボランティアを追加"
+                isOpen={isAddOpen}
+                onOpenChange={onAddChange}
+                formId="volunteer-form"
+                isLoading={isFormLoading}
+            >
+                <AddVolunteerForm
+                    raceId={raceId}
+                    id="volunteer-form"
+                    onClose={onAddClose}
+                    onLoadingChange={setIsFormLoading}
+                />
+            </CustomEditModal>
+
 
             <CustomDeleteModal
                 isOpen={isDeleteOpen}

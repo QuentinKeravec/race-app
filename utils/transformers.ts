@@ -1,6 +1,6 @@
 import {Race, TransformedRace} from "@/types/race";
 import {Participant, TransformedParticipant} from "@/types/participants";
-import {TransformedUser, UserProfile, Volunteer, TransformedVolunteer} from "@/types/profile";
+import {TransformedUser, UserProfile, Volunteer, TransformedVolunteer, Volunteer2} from "@/types/profile";
 
 export const jaDateTimeFormatter = new Intl.DateTimeFormat('ja-JP', {
     year: 'numeric',
@@ -82,10 +82,17 @@ export function transformVolunteer(volunteer: Volunteer): TransformedVolunteer {
 
     return {
         id: volunteer.id,
-        raceId: volunteer.race_id,
-        volunteerId: volunteer.volunteer_id,
         fullName: volunteerData.full_name,
         email: volunteerData.email,
         avatarUrl: volunteerData.avatar_url,
+    };
+}
+
+export function transformVolunteer2(volunteer: Volunteer2): TransformedVolunteer {
+    return {
+        id: volunteer.id,
+        fullName: volunteer.full_name,
+        email: volunteer.email,
+        avatarUrl: volunteer.avatar_url,
     };
 }

@@ -31,3 +31,18 @@ export const userSchema = z.object({
 });
 
 export type UserFormValues = z.infer<typeof userSchema>;
+
+export const volunteerSchema = z.object({
+    volunteerId: z
+        .any()
+        .transform((val) => {
+            if (val instanceof Set) return Array.from(val) as string[];
+            if (typeof val === "string") return val.split(",").filter(Boolean);
+            return val;
+        })
+        .pipe(
+            z.array(z.string()).min(1, "少なくとも1人を選択してください")
+        ),
+});
+
+export type VolunteerFormValues = z.infer<typeof volunteerSchema>;

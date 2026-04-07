@@ -31,11 +31,17 @@ export interface Volunteer {
     } | null;
 }
 
+
 export interface TransformedVolunteer {
     id: string;
-    raceId: string | null;
-    volunteerId: string | null;
-    email: string | null;
     fullName: string | null;
     avatarUrl: string | null;
+    email: string | null;
+}
+
+export interface Volunteer2 {
+    id: string
+    full_name: string | null
+    avatar_url: string | null
+    email: string | null
 }

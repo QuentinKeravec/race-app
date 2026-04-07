@@ -1,7 +1,7 @@
 'use server'
 
 import {createClient} from "@/utils/supabase/client";
-import {transformCountVolunteer, transformVolunteer, transformUser} from "@/utils/transformers";
+import {transformCountVolunteer, transformVolunteer, transformUser, transformVolunteer2} from "@/utils/transformers";
 
 const supabase = createClient();
 
@@ -39,8 +39,34 @@ export async function getVolunteersByRaceId(raceId: string) {
                 profiles ( full_name, avatar_url, email )  
             `)
         .eq('race_id', raceId)
-        .order('full_name', { ascending: true });
+        .order('profiles(full_name)', { ascending: true });
 
     if (error) throw new Error(error.message);
     return (data.map(transformVolunteer)) || [];
 }
+
+export async function getVolunteersExceptRaceId(raceId: string) {
+    const { data: alreadyRegistered } = await supabase
+        .from('race_volunteers')
+        .select('volunteer_id')
+        .eq('race_id', raceId);
+
+    const excludedIds = alreadyRegistered?.map(r => r.volunteer_id) || [];
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+            id,
+            full_name,
+            avatar_url,
+            email
+        `)
+        .not('id', 'in', `(${excludedIds.join(',')})`)
+        .eq('role_id', 'volunteer')
+        .order('full_name', { ascending: true });
+
+    if (error) throw new Error(error.message);
+
+    return (data.map(transformVolunteer2) || []) ;
+}
+

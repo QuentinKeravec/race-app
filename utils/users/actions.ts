@@ -1,5 +1,5 @@
 import {TransformedUser} from "@/types/profile";
-import {UserFormValues} from "@/schemas/userSchema";
+import {UserFormValues, volunteerSchema} from "@/schemas/userSchema";
 import {createClient} from "@/utils/supabase/client";
 
 export async function createUserAction(values: UserFormValues) {
@@ -52,4 +52,53 @@ export async function deleteUserAction(users: TransformedUser[]) {
     });
 
     if (!response.ok) throw new Error("一括削除エラー");
+}
+
+export async function createVolunteerAction({
+    raceId,
+    volunteerIds
+}: {
+    raceId: string,
+    volunteerIds: string[]
+}) {
+    const supabase = createClient();
+    const validatedFields = volunteerSchema.safeParse({ volunteerId: volunteerIds });
+    if (!validatedFields.success) {
+        return { error: "入力内容が正しくありません" };
+    }
+
+    const { volunteerId } = validatedFields.data;
+
+    const rowsToInsert = volunteerId.map((id) => ({
+        volunteer_id: id,
+        race_id: raceId,
+    }));
+
+    const { error } = await supabase
+        .from('race_volunteers')
+        .insert(rowsToInsert);
+
+    if (error) {
+        console.error(error);
+        return { error: "データベースへの保存中にエラーが発生しました" };
+    }
+
+    return { success: true };
+}
+
+export async function deleteVolunteersAction({
+    raceId,
+    ids
+}: {
+    raceId: string,
+    ids: string[]
+}) {
+    const supabase = createClient();
+
+    const { error } = await supabase
+        .from('race_volunteers')
+        .delete()
+        .in('id', ids);
+
+    return { error: error?.message };
 }
