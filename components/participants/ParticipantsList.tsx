@@ -58,12 +58,14 @@ export default function ParticipantsList({ raceId }: ParticipantsListProps) {
                 data={participants||[]}
                 columns={[
                     { name: "氏名", uid: "fullName", sortable: true },
+                    { name: "メール", uid: "email", sortable: true },
                     { name: "Runnet id", uid: "runnetId", sortable: true },
                     { name: "Tシャツのサイズ", uid: "tshirtSize", sortable: true },
                     { name: "チェックイン", uid: "checkedIn", sortable: true },
+                    { name: "確認メール送信日時", uid: "displayDate", sortable: true }
                 ]}
                 searchKey="fullName"
-                initialVisibleColumns={["fullName", "runnetId", "tshirtSize", "checkedIn"]}
+                initialVisibleColumns={["fullName", "email", "runnetId", "tshirtSize", "checkedIn", "displayDate"]}
                 onDelete={(ids) => {
                     const stringIds = ids.map(id => String(id));
 
@@ -80,6 +82,8 @@ export default function ParticipantsList({ raceId }: ParticipantsListProps) {
                             return <p className="font-bold">{item.eventName || "N/A"}</p>;
                         case "tshirtSize":
                             return <p className="font-bold">{item.tshirtSize}</p>;
+                        case "displayDate":
+                            return <p className="font-bold">{item.displayDate}</p>;
                         case "checkedIn":
                             return (
                                 <Chip

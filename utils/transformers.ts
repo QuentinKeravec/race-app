@@ -43,6 +43,9 @@ export function transformParticipant(participant: Participant): TransformedParti
         tshirtSize: participant.tshirt_size,
         checkedIn: participant.checked_in,
         raceId: participant.race_id,
+        email: participant.email,
+        confirmationSentAt: participant.confirmation_sent_at ? new Date(participant.confirmation_sent_at).toISOString() : "未送信",
+        displayDate: participant.confirmation_sent_at ? jaDateTimeFormatter.format(new Date(participant.confirmation_sent_at)) : "未送信"
     };
 }
 

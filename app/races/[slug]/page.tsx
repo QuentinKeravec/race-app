@@ -10,6 +10,7 @@ import {getStatuses} from "@/utils/statuses/queries";
 import ParticipantCounter from "@/components/participants/ParticipantCounter";
 import {getParticipantsByRaceId} from "@/utils/participants/queries";
 import VolunteerCounter from "@/components/users/VolunteerCounter";
+import {SendMailButton} from "@/components/participants/SendMailButton";
 
 interface RacePageProps {
     params: Promise<{ slug: string }>;
@@ -51,6 +52,7 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
                 </div>
                 <div className="flex gap-3">
                     <ImportParticipants raceId={race?.id} existingParticipants={participants}/>
+                    <SendMailButton race={{id: race?.id, name: race?.name, eventName: race?.eventName}} existingParticipants={participants}/>
                 </div>
             </div>
 

@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useRef } from 'react';
+import React, {useRef} from 'react';
 import Papa from 'papaparse';
 import {Button} from "@heroui/button";
 import {Upload} from "lucide-react";
-import {TransformedParticipant, ParticipantCSV} from "@/types/participants";
+import {ParticipantCSV, TransformedParticipant} from "@/types/participants";
 import {useUpsertParticipants} from "@/hooks/useParticipants";
 import {addToast} from "@heroui/toast";
 
@@ -26,8 +26,7 @@ export default function ImportParticipants({ raceId, existingParticipants }: { r
             complete: async (results) => {
                 const data = results.data.map(participant  => ({
                     ...participant,
-                    race_id: raceId,
-                    checked_in: participant.checked_in === 'true'
+                    race_id: raceId
                 }));
 
                 const dataToUpsert = data.filter(newP => {
@@ -38,7 +37,7 @@ export default function ImportParticipants({ raceId, existingParticipants }: { r
                     return (
                         existing.fullName !== newP.full_name ||
                         existing.tshirtSize !== newP.tshirt_size ||
-                        existing.checkedIn !== newP.checked_in
+                        existing.email !== newP.email
                     );
                 });
 

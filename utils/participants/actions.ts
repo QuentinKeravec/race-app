@@ -39,3 +39,16 @@ export async function upsertParticipantsAction({
         success: true,
     };
 }
+
+export const markAsEmailSent = async (id: string) => {
+    const { data, error } = await supabase
+        .from('participants')
+        .update({ confirmation_sent_at: new Date().toISOString() })
+        .eq('id', id);
+
+    if (error) {
+        return { error: "データベースへの保存中にエラーが発生しました" };
+    }
+
+    return data;
+};
