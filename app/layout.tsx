@@ -5,7 +5,7 @@ import { Providers } from "./providers";
 import { fontSans } from "@/config/fonts";
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { NavbarWrapper } from "@/components/navbar-wrapper";
+import { CustomSidebar } from "@/components/ui/CustomSidebar";
 
 export const viewport = { //
   themeColor: [
@@ -54,7 +54,7 @@ export default async function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <NavbarWrapper user={user}>{children}</NavbarWrapper>
+          <CustomSidebar user={user}>{children}</CustomSidebar>
         </Providers>
       </body>
     </html>

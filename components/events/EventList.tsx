@@ -76,7 +76,7 @@ export default function EventList({ initialEvents }: EventListProps) {
                 onRowAction={(id) => {
                     const event = initialEvents.find(r => r.id.toString() === id.toString());
                     if (event) {
-                        router.push(`/events/${event.slug}`);
+                        router.push(`/dashboard/events/${event.slug}`);
                     }
                 }}
                 searchLabel="名前"

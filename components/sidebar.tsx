@@ -25,17 +25,17 @@ export const Sidebar = ({ onAction }: SidebarProps) => {
             icon: <LayoutGrid size={20}/>,
         },
         {
-            key: "/events",
+            key: "/dashboard/events",
             label: "イベント",
             icon: <Balloon size={20}/>,
         },
         {
-            key: "/races",
+            key: "/dashboard/races",
             label: "レース",
             icon: <MapPinned size={20}/>,
         },
         {
-            key: "/users",
+            key: "/dashboard/users",
             label: "ユーザー",
             icon: <UserRound size={20}/>,
         },
@@ -43,7 +43,7 @@ export const Sidebar = ({ onAction }: SidebarProps) => {
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        router.push("/login");
+        router.push("/");
         router.refresh();
     };
 

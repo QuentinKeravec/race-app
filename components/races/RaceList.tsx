@@ -86,7 +86,7 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                 onRowAction={(id) => {
                     const race = races?.find(r => r.id.toString() === id.toString());
                     if (race) {
-                        router.push(`/races/${race.slug}`);
+                        router.push(`/dashboard/races/${race.slug}`);
                     }
                 }}
                 searchLabel="名前"
