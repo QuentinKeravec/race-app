@@ -1,11 +1,11 @@
 'use server'
 
-import {createClient} from "@/utils/supabase/client";
+import {createClient} from "@/utils/supabase/server";
 import {RaceFormValues, raceSchema} from "@/schemas/raceSchema";
 
-const supabase = createClient();
-
 export async function createRaceAction(data: RaceFormValues) {
+    const supabase = await createClient();
+
     const validatedFields = raceSchema.safeParse(data);
     if (!validatedFields.success) {
         return { error: "入力内容が正しくありません" };
@@ -44,6 +44,8 @@ export async function createRaceAction(data: RaceFormValues) {
 }
 
 export async function updateRaceAction({ raceId, data }: { raceId: string, data: RaceFormValues }) {
+    const supabase = await createClient();
+
     const validatedFields = raceSchema.safeParse(data);
     if (!validatedFields.success) {
         return { error: "入力内容が正しくありません" };
@@ -83,6 +85,8 @@ export async function updateRaceAction({ raceId, data }: { raceId: string, data:
 }
 
 export async function deleteRacesAction(ids: string[]) {
+    const supabase = await createClient();
+
     const { error } = await supabase
         .from('races')
         .delete()

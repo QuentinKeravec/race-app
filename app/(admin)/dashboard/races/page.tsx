@@ -7,7 +7,7 @@ import {getEvents} from "@/utils/events/queries";
 import {getStatuses} from "@/utils/statuses/queries";
 
 export const metadata: Metadata = {
-    title: "レース一覧",
+    title: "レース一覧 - Course",
     description: "全てのレース管理画面",
 };
 

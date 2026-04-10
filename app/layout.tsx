@@ -1,11 +1,8 @@
 import "@/styles/globals.css";
 import clsx from "clsx";
 
-import { Providers } from "./providers";
-import { fontSans } from "@/config/fonts";
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import { CustomSidebar } from "@/components/ui/CustomSidebar";
+import {Providers} from "./providers";
+import {fontSans} from "@/config/fonts";
 
 export const viewport = { //
   themeColor: [
@@ -19,31 +16,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                  cookieStore.set(name, value, options)
-              )
-            } catch {
-              //
-            }
-          },
-        },
-      }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
-
   return (
     <html suppressHydrationWarning lang="en">
       <head />
@@ -54,7 +26,7 @@ export default async function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <CustomSidebar user={user}>{children}</CustomSidebar>
+          {children}
         </Providers>
       </body>
     </html>

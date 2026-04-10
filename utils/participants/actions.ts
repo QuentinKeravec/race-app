@@ -1,9 +1,7 @@
 'use server'
 
-import {createClient} from "@/utils/supabase/client";
+import {createClient} from "@/utils/supabase/server";
 import {ParticipantImport} from "@/types/participants";
-
-const supabase = createClient();
 
 export async function deleteParticipantsAction({
     raceId,
@@ -12,6 +10,8 @@ export async function deleteParticipantsAction({
     raceId: string,
     ids: string[]
 }) {
+    const supabase = await createClient();
+
     const { error } = await supabase
         .from('participants')
         .delete()
@@ -27,6 +27,8 @@ export async function upsertParticipantsAction({
     raceId: string,
     data: ParticipantImport[]
 }) {
+    const supabase = await createClient();
+
     const { error } = await supabase
         .from('participants')
         .upsert(data, { onConflict: 'race_id, runnet_id' });
@@ -41,6 +43,8 @@ export async function upsertParticipantsAction({
 }
 
 export const markAsEmailSent = async (id: string) => {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('participants')
         .update({ confirmation_sent_at: new Date().toISOString() })

@@ -5,6 +5,17 @@ import {transformCountRace, transformParticipant} from "@/utils/transformers";
 
 const supabase = createClient();
 
+export async function getParticipantById(participantId: string) {
+    const { data, error } = await supabase
+        .from('participants')
+        .select('*')
+        .eq('id', participantId)
+        .single();
+
+    if (error) throw new Error(error.message);
+    return (transformParticipant(data)) || [];
+}
+
 export async function getParticipantsByRaceId(raceId: string) {
     const { data, error } = await supabase
         .from('participants')

@@ -5,11 +5,12 @@ import {useState} from "react";
 import {Button} from "@heroui/button";
 import {Menu, LayoutGrid} from "lucide-react";
 import {Drawer, DrawerContent} from "@heroui/drawer";
-import LoginForm from "@/components/ui/LoginForm";
+import LoginModal from "@/components/ui/LoginModal";
+import {User} from "@supabase/auth-js";
 
-export function CustomSidebar({ children, user }: { children: React.ReactNode, user: any }) {
+export function CustomSidebar({ children, user }: { children: React.ReactNode, user: User | null}) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+    console.log("user", user);
     return (
         <div className="flex min-h-screen bg-background">
             <aside className="hidden md:block w-72 fixed inset-y-0 left-0 border-r border-divider">
@@ -56,13 +57,7 @@ export function CustomSidebar({ children, user }: { children: React.ReactNode, u
             </Drawer>
 
             {!user && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/10 backdrop-blur-sm">
-                    <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
-                        <h2 className="text-2xl font-bold mb-4">ようこそ</h2>
-                        <p className="mb-6 text-gray-600">管理インターフェースにアクセスする</p>
-                        <LoginForm />
-                    </div>
-                </div>
+                <LoginModal />
             )}
         </div>
     );

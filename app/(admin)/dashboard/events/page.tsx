@@ -2,11 +2,11 @@ import React from "react";
 import {title} from "@/components/primitives";
 import {Divider} from "@heroui/divider";
 import EventList from "@/components/events/EventList";
-import {createClient} from "@/utils/supabase/client";
+import {createClient} from "@/utils/supabase/server";
 import {Metadata} from "next";
 
 export const metadata: Metadata = {
-    title: "イベント一覧",
+    title: "イベント一覧 - Course",
     description: "全てのイベント管理画面",
 };
 

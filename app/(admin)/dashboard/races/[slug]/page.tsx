@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: RacePageProps): Promise<Metad
     const race = await getRaceBySlug(slug);
 
     return {
-        title: "レース一覧 > " + race?.name,
+        title: "レース一覧 > " + race?.name + " - Course",
         description: `Détails et gestion de la course : ${race?.name}.`
     };
 }
@@ -36,7 +36,6 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
     ]);
 
     const participants = await getParticipantsByRaceId(race.id);
-
 
     return (
         <div className="max-w-7xl mx-auto p-2 space-y-8">
