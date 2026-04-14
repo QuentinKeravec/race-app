@@ -13,6 +13,7 @@ import VolunteerCounter from "@/components/users/VolunteerCounter";
 import {createClient} from "@/utils/supabase/server";
 import ScanModal from "@/components/scan/ScanModal";
 import {redirect} from "next/navigation";
+import CheckedInParticipantCounter from "@/components/participants/CheckedInParticipantCounter";
 
 interface RacePageProps {
     params: Promise<{ slug: string }>;
@@ -64,8 +65,9 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <ParticipantCounter raceId={race.id} />
+                <CheckedInParticipantCounter raceId={race.id} />
                 <VolunteerCounter raceId={race.id} />
 
                 <Card className="border-none bg-danger/40 shadow-none">

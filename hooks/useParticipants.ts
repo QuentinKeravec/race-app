@@ -1,7 +1,7 @@
 'use client';
 
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {getParticipantCount, getParticipantsByRaceId} from "@/utils/participants/queries";
+import {getCheckedInParticipantCount, getParticipantCount, getParticipantsByRaceId} from "@/utils/participants/queries";
 import {deleteParticipantsAction, upsertParticipantsAction} from "@/utils/participants/actions";
 import {addToast} from "@heroui/toast";
 
@@ -79,6 +79,14 @@ export function useParticipantCount(raceId: string) {
     return useQuery({
         queryKey: ["participants", raceId, "count"],
         queryFn: () => getParticipantCount(raceId),
+        enabled: !!raceId,
+    });
+}
+
+export function useCheckedInParticipantCount(raceId: string) {
+    return useQuery({
+        queryKey: ["participants", raceId, "checkedInCount"],
+        queryFn: () => getCheckedInParticipantCount(raceId),
         enabled: !!raceId,
     });
 }

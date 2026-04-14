@@ -45,14 +45,13 @@ export default function RaceTabs ({ race, events, status }: RaceTabsProps) {
                 <Tabs
                     selectedKey={initialTab}
                     onSelectionChange={handleTabChange}
-                    disabledKeys={isPending ? ["volunteers", "participants", "inventory", "infos"] : []}
+                    disabledKeys={isPending ? ["volunteers", "participants", "infos"] : []}
                     color="primary"
                     classNames={{ tabList: "gap-6", cursor: "w-full" }}
                     radius="md"
                 >
                     <Tab key="volunteers" title="ボランティア" />
                     <Tab key="participants" title="参加者" />
-                    <Tab key="inventory" title="在庫" />
                     <Tab key="infos" title="詳細" />
                 </Tabs>
             </CardHeader>
@@ -60,7 +59,6 @@ export default function RaceTabs ({ race, events, status }: RaceTabsProps) {
             <CardBody className="px-6 space-y-4">
                 {selected === "volunteers" && <VolunteersList raceId={race.id}/>}
                 {selected === "participants" && <ParticipantsList race={race}/>}
-                {selected === "inventory" && <p>Contenu des Vidéos...</p>}
                 {selected === "infos" && <EditRaceForm race={race} events={events} status={status}/>}
             </CardBody>
         </Card>

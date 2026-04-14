@@ -1,10 +1,11 @@
 import {Skeleton} from "@heroui/skeleton";
 import {Card, CardBody} from "@heroui/card";
 
-export const CardSkeleton = ({ bgColor } : { bgColor: "primary" | "warning" }) => {
+export const CardSkeleton = ({ bgColor } : { bgColor: "primary" | "warning" | "secondary" }) => {
     const bgClasses = {
         primary: "bg-primary/20",
         warning: "bg-warning/20",
+        secondary: "bg-secondary/20",
     };
 
     return (

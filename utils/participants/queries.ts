@@ -49,6 +49,22 @@ export async function getParticipantCount(raceId: string) {
                 registrations,
                 participants:participants(count)
         `)
+        .eq('id', raceId)
+        .single();
+
+    if (error) throw new Error(error.message);
+    return transformCountRace(data);
+}
+
+export async function getCheckedInParticipantCount(raceId: string) {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from('races')
+        .select(`
+                registrations,
+                participants:participants(count)
+        `)
         .eq('participants.checked_in', true)
         .eq('id', raceId)
         .single();
