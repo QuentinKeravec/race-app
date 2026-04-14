@@ -37,6 +37,8 @@ export type Database = {
       }
       participants: {
         Row: {
+          checked_at: string | null
+          checked_by: string | null
           checked_in: boolean
           confirmation_sent_at: string | null
           email: string | null
@@ -47,6 +49,8 @@ export type Database = {
           tshirt_size: string | null
         }
         Insert: {
+          checked_at?: string | null
+          checked_by?: string | null
           checked_in?: boolean
           confirmation_sent_at?: string | null
           email?: string | null
@@ -57,6 +61,8 @@ export type Database = {
           tshirt_size?: string | null
         }
         Update: {
+          checked_at?: string | null
+          checked_by?: string | null
           checked_in?: boolean
           confirmation_sent_at?: string | null
           email?: string | null

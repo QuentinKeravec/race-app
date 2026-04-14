@@ -10,15 +10,23 @@ import {CustomDeleteModal} from "@/components/ui/CustomDeleteModal";
 import {TableSkeleton} from "@/components/ui/TableSkeleton";
 import {useDeleteParticipants} from "@/hooks/useParticipants";
 import {useParticipants} from "@/hooks/useParticipants";
+import {MailModal} from "@/components/mails/MailModal";
+import {useSendEmails} from "@/hooks/useEmails";
+import {useQueryClient} from "@tanstack/react-query";
+import {addToast} from "@heroui/toast";
+import {TransformedRace} from "@/types/race";
 
 interface ParticipantsListProps {
-    raceId: string;
+    race: TransformedRace;
 }
 
-export default function ParticipantsList({ raceId }: ParticipantsListProps) {
-    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteChange, onClose: onDeleteClose } = useDisclosure();
+export default function ParticipantsList({ race }: ParticipantsListProps) {
+    const queryClient = useQueryClient();
 
-    const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteChange, onClose: onDeleteClose } = useDisclosure();
+    const { isOpen: isSendOpen, onOpen: onSendOpen, onOpenChange: onSendChange, onClose: onSendClose } = useDisclosure();
+
+    const [ids, setIds] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
     const [isClient, setIsClient] = useState(false);
 
@@ -26,11 +34,12 @@ export default function ParticipantsList({ raceId }: ParticipantsListProps) {
         setIsClient(true);
     }, []);
 
-    const { data: participants } = useParticipants(raceId);
+    const { data: participants } = useParticipants(race.id);
     const { mutate: deleteParticipants, isPending } = useDeleteParticipants();
+    const { sendAllMails, isLoading, progress } = useSendEmails();
 
     const handleConfirmDelete = () => {
-        deleteParticipants({raceId, ids: idsToDelete}, {
+        deleteParticipants({raceId: race.id, ids: ids}, {
             onSuccess: (result) => {
                 if (!result?.error) {
                     setSelectedKeys(new Set([]));
@@ -38,6 +47,28 @@ export default function ParticipantsList({ raceId }: ParticipantsListProps) {
                 }
             }
         });
+    };
+
+    const handleConfirmSend = async () => {
+        if (!participants) return;
+        const count = await sendAllMails(participants, race, ids);
+
+        queryClient.invalidateQueries({ queryKey: ["participants", race.id] });
+
+        if (count > 0) {
+            addToast({
+                title: "送信完了",
+                description: `${count}通のメール送信を完了しました。`,
+                color: "success",
+            });
+        } else {
+            addToast({
+                title: "情報",
+                description: "送信対象の参加者はいませんでした。",
+                color: "primary",
+            });
+        }
+        onSendClose();
     };
 
     if (!isClient) return <TableSkeleton />;
@@ -50,9 +81,9 @@ export default function ParticipantsList({ raceId }: ParticipantsListProps) {
                     setSelectedKeys(keys);
 
                     if (keys === "all") {
-                        setIdsToDelete(participants?.map(r => String(r.id)) ?? []);
+                        setIds(participants?.map(r => String(r.id)) ?? []);
                     } else {
-                        setIdsToDelete(Array.from(keys).map(k => String(k)));
+                        setIds(Array.from(keys).map(k => String(k)));
                     }
                 }}
                 data={participants||[]}
@@ -69,11 +100,18 @@ export default function ParticipantsList({ raceId }: ParticipantsListProps) {
                 onDelete={(ids) => {
                     const stringIds = ids.map(id => String(id));
 
-                    setIdsToDelete(stringIds);
+                    setIds(stringIds);
                     onDeleteOpen();
                 }}
                 searchLabel="氏名"
                 addButton={false}
+                emailButton={true}
+                onSend={(ids) => {
+                    const stringIds = ids.map(id => String(id));
+
+                    setIds(stringIds);
+                    onSendOpen();
+                }}
                 renderCell={(item: any, columnKey) => {
                     switch (columnKey) {
                         case "fullName":
@@ -106,7 +144,16 @@ export default function ParticipantsList({ raceId }: ParticipantsListProps) {
                 onOpenChange={onDeleteChange}
                 onDelete={handleConfirmDelete}
                 isLoading={isPending}
-                ids={idsToDelete}
+                ids={ids}
+            />
+
+            <MailModal
+                isOpen={isSendOpen}
+                onOpenChange={onSendChange}
+                onSend={handleConfirmSend}
+                isLoading={isLoading}
+                progress={progress}
+                ids={ids}
             />
         </>
     );

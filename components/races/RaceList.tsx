@@ -14,6 +14,7 @@ import {TableSkeleton} from "@/components/ui/TableSkeleton";
 import {Tables} from "@/types/supabase";
 import {TransformedRace} from "@/types/race";
 import {useDeleteRaces, useRaces} from "@/hooks/useRaces";
+import {MailModal} from "@/components/mails/MailModal";
 
 interface RaceListProps {
     initialRaces: TransformedRace[];
@@ -28,7 +29,7 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onOpenChange: onDeleteChange, onClose: onDeleteClose } = useDisclosure();
 
     const [isFormLoading, setIsFormLoading] = useState(false);
-    const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
+    const [ids, setIds] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
     const [isClient, setIsClient] = useState(false);
 
@@ -40,7 +41,7 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
     const { mutate: deleteRaces, isPending } = useDeleteRaces();
 
     const handleConfirmDelete = () => {
-        deleteRaces(idsToDelete, {
+        deleteRaces(ids, {
             onSuccess: (result) => {
                 if (!result?.error) {
                     setSelectedKeys(new Set([]));
@@ -60,9 +61,9 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                     setSelectedKeys(keys);
 
                     if (keys === "all") {
-                        setIdsToDelete(initialRaces.map(r => String(r.id)));
+                        setIds(initialRaces.map(r => String(r.id)));
                     } else {
-                        setIdsToDelete(Array.from(keys).map(k => String(k)));
+                        setIds(Array.from(keys).map(k => String(k)));
                     }
                 }}
                 data={races||[]}
@@ -80,7 +81,7 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                 onDelete={(ids) => {
                     const stringIds = ids.map(id => String(id));
 
-                    setIdsToDelete(stringIds);
+                    setIds(stringIds);
                     onDeleteOpen();
                 }}
                 onRowAction={(id) => {
@@ -136,7 +137,7 @@ export default function RaceList({ initialRaces, events, statuses, statusOptions
                 onOpenChange={onDeleteChange}
                 onDelete={handleConfirmDelete}
                 isLoading={isPending}
-                ids={idsToDelete}
+                ids={ids}
             />
         </>
     );

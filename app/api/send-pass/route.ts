@@ -25,7 +25,7 @@ export async function POST(request: Request) {
               <p style="font-size: 14px;">以下のボタンをクリックしてQRコードを表示し、受付スタッフにご提示ください。</p>
 
               <div style="text-align: center; margin: 25px 0;">
-                <a href="${process.env.NEXT_PUBLIC_SITE_URL}/pass/${participantId}" 
+                <a href="${process.env.NEXT_PUBLIC_SITE_URL}/pass/${race}/${participantId}" 
                    style="background-color: #0070f3; color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block;">
                   参加証（QRコード）を表示する
                 </a>
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
             </p>
          </div>`;
 
-        const { data, error } = await resend.emails.send({
+        const { error } = await resend.emails.send({
             from: 'Course <onboarding@resend.dev>',
             to: [email],
             subject: subject,

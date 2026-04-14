@@ -45,7 +45,10 @@ export function transformParticipant(participant: Participant): TransformedParti
         raceId: participant.race_id,
         email: participant.email,
         confirmationSentAt: participant.confirmation_sent_at ? new Date(participant.confirmation_sent_at).toISOString() : "未送信",
-        displayDate: participant.confirmation_sent_at ? jaDateTimeFormatter.format(new Date(participant.confirmation_sent_at)) : "未送信"
+        displayDate: participant.confirmation_sent_at ? jaDateTimeFormatter.format(new Date(participant.confirmation_sent_at)) : "未送信",
+        checkedAt: participant.checked_at ? new Date(participant.checked_at).toISOString() : "",
+        checkedAtDisplayDate: participant.checked_at ? jaDateTimeFormatter.format(new Date(participant.checked_at)) : "",
+        checkedBy: participant.checked_by
     };
 }
 
@@ -85,7 +88,7 @@ export function transformVolunteer(volunteer: Volunteer): TransformedVolunteer {
 
     return {
         id: volunteer.id,
-        fullName: volunteerData.full_name,
+        fullName: volunteerData.full_name ?? "",
         email: volunteerData.email,
         avatarUrl: volunteerData.avatar_url,
     };
@@ -94,7 +97,7 @@ export function transformVolunteer(volunteer: Volunteer): TransformedVolunteer {
 export function transformVolunteer2(volunteer: Volunteer2): TransformedVolunteer {
     return {
         id: volunteer.id,
-        fullName: volunteer.full_name,
+        fullName: volunteer.full_name ?? "",
         email: volunteer.email,
         avatarUrl: volunteer.avatar_url,
     };

@@ -6,8 +6,9 @@ export function useSendEmails() {
     const [isLoading, setIsLoading] = useState(false);
     const [progress, setProgress] = useState({ current: 0, total: 0 });
 
-    const sendAllMails = async (participants: TransformedParticipant[], race: { name: string, eventName: string }) => {
-        const toSend = participants.filter(p => !p.checkedIn);
+    const sendAllMails = async (participants: TransformedParticipant[], race: { name: string, eventName: string }, ids: string[]) => {
+        const idsSet = new Set(ids);
+        const toSend = participants.filter(p => idsSet.has(p.id));
         setIsLoading(true);
         setProgress({ current: 0, total: toSend.length });
 

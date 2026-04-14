@@ -10,7 +10,9 @@ import {getStatuses} from "@/utils/statuses/queries";
 import ParticipantCounter from "@/components/participants/ParticipantCounter";
 import {getParticipantsByRaceId} from "@/utils/participants/queries";
 import VolunteerCounter from "@/components/users/VolunteerCounter";
-import {SendMailButton} from "@/components/participants/SendMailButton";
+import {createClient} from "@/utils/supabase/server";
+import ScanModal from "@/components/scan/ScanModal";
+import {redirect} from "next/navigation";
 
 interface RacePageProps {
     params: Promise<{ slug: string }>;
@@ -27,6 +29,9 @@ export async function generateMetadata({ params }: RacePageProps): Promise<Metad
 }
 
 export default async function RaceDetailsPage({ params }: RacePageProps) {
+    const supabase = await createClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
     const { slug } = await params;
 
     const [race, events, status] = await Promise.all([
@@ -36,6 +41,10 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
     ]);
 
     const participants = await getParticipantsByRaceId(race.id);
+
+    if (!user) {
+        redirect("/");
+    }
 
     return (
         <div className="max-w-7xl mx-auto p-2 space-y-8">
@@ -51,7 +60,7 @@ export default async function RaceDetailsPage({ params }: RacePageProps) {
                 </div>
                 <div className="flex gap-3">
                     <ImportParticipants raceId={race?.id} existingParticipants={participants}/>
-                    <SendMailButton race={{id: race?.id, name: race?.name, eventName: race?.eventName}} existingParticipants={participants}/>
+                    <ScanModal user={user} race={race}/>
                 </div>
             </div>
 

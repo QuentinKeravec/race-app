@@ -56,3 +56,18 @@ export const markAsEmailSent = async (id: string) => {
 
     return data;
 };
+
+export const updateCheckInParticipant = async (id: string, userId: string) => {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from('participants')
+        .update({
+            checked_in: true,
+            checked_at: new Date().toISOString(),
+            checked_by: userId
+        })
+        .eq('id', id);
+
+    return { error: error?.message };
+};

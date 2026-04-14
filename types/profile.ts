@@ -34,7 +34,7 @@ export interface Volunteer {
 
 export interface TransformedVolunteer {
     id: string;
-    fullName: string | null;
+    fullName: string;
     avatarUrl: string | null;
     email: string | null;
 }

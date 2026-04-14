@@ -8,12 +8,23 @@ const supabase = createClient();
 export async function getParticipantById(participantId: string) {
     const { data, error } = await supabase
         .from('participants')
-        .select('*')
+        .select(`
+            *,
+            races (
+                name
+            )
+        `)
         .eq('id', participantId)
         .single();
 
     if (error) throw new Error(error.message);
-    return (transformParticipant(data)) || [];
+
+    const transformed = transformParticipant(data);
+
+    return {
+        ...transformed,
+        raceName: data.races?.name || data.race_id
+    };
 }
 
 export async function getParticipantsByRaceId(raceId: string) {
@@ -34,6 +45,7 @@ export async function getParticipantCount(raceId: string) {
                 registrations,
                 participants:participants(count)
         `)
+        .eq('participants.checked_in', true)
         .eq('id', raceId)
         .single();
 

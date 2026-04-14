@@ -37,6 +37,8 @@ interface CustomTableProps<T> {
     addButton?: boolean;
     sortButtonLabel?:string;
     filterKey?: string;
+    emailButton?: boolean;
+    onSend?: (ids: (string | number)[]) => void;
 }
 
 export function CustomTable<T extends { id: string }>({
@@ -54,7 +56,9 @@ export function CustomTable<T extends { id: string }>({
                                                                    onSelectionChange,
                                                                    addButton = true,
                                                                    sortButtonLabel,
-                                                                   filterKey = "statusId"
+                                                                   filterKey = "statusId",
+                                                                   emailButton = false,
+                                                                   onSend
                                                                }: CustomTableProps<T>) {
     const [filterValue, setFilterValue] = React.useState("");
     const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(initialVisibleColumns));
@@ -113,6 +117,15 @@ export function CustomTable<T extends { id: string }>({
             ? sortedItems.map(item => item.id)
             : Array.from(selectedKeys);
         onDelete(ids);
+    };
+
+    const handlePrepareSend = () => {
+        const ids = selectedKeys === "all"
+            ? sortedItems.map(item => item.id)
+            : Array.from(selectedKeys);
+        if (onSend) {
+            onSend(ids);
+        }
     };
 
     const onRowsPerPageChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -180,6 +193,13 @@ export function CustomTable<T extends { id: string }>({
                     {count > 0 && (
                         <Button onPress={handlePrepareDelete} color="danger">
                             {count}件を削除
+                        </Button>
+                    )}
+
+
+                    {count > 0 && emailButton && (
+                        <Button onPress={handlePrepareSend} color="primary">
+                            {count}通のメールを送信
                         </Button>
                     )}
                 </div>

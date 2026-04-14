@@ -27,8 +27,8 @@ export default async function PassPage({ params }: PassPageProps) {
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
             <Card className="max-w-[400px] w-full shadow-xl">
                 <CardHeader className="flex flex-col gap-1 items-center bg-primary text-white py-6">
-                    <p className="text-tiny uppercase font-bold opacity-80">Official Participation Pass</p>
-                    <h1 className="text-xl font-bold">{participant.raceId}</h1>
+                    <p className="text-tiny uppercase font-bold opacity-80">参加証</p>
+                    <h1 className="text-xl font-bold">{participant.raceName}</h1>
                 </CardHeader>
 
                 <CardBody className="flex flex-col items-center gap-6 py-8">

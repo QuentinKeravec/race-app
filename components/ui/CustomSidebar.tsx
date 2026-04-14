@@ -10,7 +10,7 @@ import {User} from "@supabase/auth-js";
 
 export function CustomSidebar({ children, user }: { children: React.ReactNode, user: User | null}) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    console.log("user", user);
+
     return (
         <div className="flex min-h-screen bg-background">
             <aside className="hidden md:block w-72 fixed inset-y-0 left-0 border-r border-divider">

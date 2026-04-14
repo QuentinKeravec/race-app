@@ -6,7 +6,9 @@ export type Participant = {
     tshirt_size: string | null,
     checked_in: boolean,
     email: string | null,
-    confirmation_sent_at: string | null
+    confirmation_sent_at: string | null,
+    checked_at: string | null,
+    checked_by: string | null
 }
 
 export type TransformedParticipant = {
@@ -17,8 +19,11 @@ export type TransformedParticipant = {
     checkedIn: boolean,
     raceId: string,
     email: string | null,
-    confirmationSentAt: string | null
-    displayDate: string | null
+    confirmationSentAt: string | null,
+    displayDate: string | null,
+    checkedAt: string | null,
+    checkedAtDisplayDate: string | null,
+    checkedBy: string | null
 }
 
 export type ParticipantCSV = {

@@ -54,6 +54,8 @@ export default function VolunteersList({ raceId }: VolunteersListProps) {
                     setSelectedKeys(keys);
 
                     if (keys === "all") {
+                        if (!volunteers) return;
+
                         setIdsToDelete(volunteers.map(r => String(r.id)));
                     } else {
                         setIdsToDelete(Array.from(keys).map(k => String(k)));
