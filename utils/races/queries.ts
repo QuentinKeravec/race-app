@@ -1,12 +1,12 @@
 'use server'
 
 import {cache} from 'react';
-import {createClient} from "@/utils/supabase/client";
+import {createClient} from "@/utils/supabase/server";
 import {transformRace} from "@/utils/transformers";
 
-const supabase = createClient();
-
 export async function getRaces() {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('races')
         .select(`
@@ -21,6 +21,8 @@ export async function getRaces() {
 }
 
 export const getRaceBySlug = cache(async function getRaceBySlug(slug: string) {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('races')
         .select(`

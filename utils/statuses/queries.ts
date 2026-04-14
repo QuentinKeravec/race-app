@@ -1,8 +1,10 @@
-import {createClient} from "@/utils/supabase/client";
+'use server'
 
-const supabase = createClient();
+import {createClient} from "@/utils/supabase/server";
 
 export async function getStatuses() {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('race_statuses')
         .select(`

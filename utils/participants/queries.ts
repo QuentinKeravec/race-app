@@ -1,11 +1,11 @@
 'use server'
 
-import {createClient} from "@/utils/supabase/client";
+import {createClient} from "@/utils/supabase/server";
 import {transformCountRace, transformParticipant} from "@/utils/transformers";
 
-const supabase = createClient();
-
 export async function getParticipantById(participantId: string) {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('participants')
         .select(`
@@ -28,6 +28,8 @@ export async function getParticipantById(participantId: string) {
 }
 
 export async function getParticipantsByRaceId(raceId: string) {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('participants')
         .select('*')
@@ -39,6 +41,8 @@ export async function getParticipantsByRaceId(raceId: string) {
 }
 
 export async function getParticipantCount(raceId: string) {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('races')
         .select(`

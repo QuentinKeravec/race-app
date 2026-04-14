@@ -1,9 +1,11 @@
+'use server'
+
 import {TransformedUser} from "@/types/profile";
 import {UserFormValues, volunteerSchema} from "@/schemas/userSchema";
-import {createClient} from "@/utils/supabase/client";
+import {createClient} from "@/utils/supabase/server";
 
 export async function createUserAction(values: UserFormValues) {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     let avatarUrl = "";
 
@@ -61,7 +63,7 @@ export async function createVolunteerAction({
     raceId: string,
     volunteerIds: string[]
 }) {
-    const supabase = createClient();
+    const supabase = await createClient();
     const validatedFields = volunteerSchema.safeParse({ volunteerId: volunteerIds });
     if (!validatedFields.success) {
         return { error: "入力内容が正しくありません" };
@@ -93,7 +95,7 @@ export async function deleteVolunteersAction({
     raceId: string,
     ids: string[]
 }) {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { error } = await supabase
         .from('race_volunteers')

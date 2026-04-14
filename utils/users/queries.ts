@@ -1,11 +1,11 @@
 'use server'
 
-import {createClient} from "@/utils/supabase/client";
+import {createClient} from "@/utils/supabase/server";
 import {transformCountVolunteer, transformVolunteer, transformUser, transformVolunteer2} from "@/utils/transformers";
 
-const supabase = createClient();
-
 export async function getUsers() {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -18,6 +18,8 @@ export async function getUsers() {
 }
 
 export async function getVolunteerCount(raceId: string) {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('races')
         .select(`
@@ -32,6 +34,8 @@ export async function getVolunteerCount(raceId: string) {
 }
 
 export async function getVolunteersByRaceId(raceId: string) {
+    const supabase = await createClient();
+
     const { data, error } = await supabase
         .from('race_volunteers')
         .select(`
@@ -46,6 +50,8 @@ export async function getVolunteersByRaceId(raceId: string) {
 }
 
 export async function getVolunteersExceptRaceId(raceId: string) {
+    const supabase = await createClient();
+
     const { data: alreadyRegistered } = await supabase
         .from('race_volunteers')
         .select('volunteer_id')
